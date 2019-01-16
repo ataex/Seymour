@@ -2,8 +2,7 @@
 ## About
 [FastCGI](https://en.wikipedia.org/wiki/FastCGI) allows for the creation of persistent CGI applications run in seperate processes. While no longer officially maintained on its own, FastCGI has been incorporated into popular web servers (like Apache, Nginx, and Haiwatha) and continues to be supported by the community. See the unofficial documentation [here](https://fast-cgi.github.io/).
 
-Examples are taken from http://chriswu.me/blog/writing-hello-world-in-fcgi-with-c-plus-plus/ and use the [Nginx web server](https://www.nginx.com/). **Note: Since the writting of the tutorials the glm specification has changed. mat4 operations and contrustors now require at least one argument, ex glm:mat4 translate should now be glm::mat4 translate(1).**
-
+Examples are taken from http://chriswu.me/blog/writing-hello-world-in-fcgi-with-c-plus-plus/ and use the [Nginx web server](https://www.nginx.com/).
 ## Files
 
 ## Running the examples (under Linux)
