@@ -1,4 +1,4 @@
-#Happy Buddha#
+# Happy Buddha
 
 		       Surface Reconstructions
 
