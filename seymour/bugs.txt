@@ -1,0 +1,2 @@
+* weird error, certain models wont load with assimp
+* looks to be because certain properties are missing from the mtl file

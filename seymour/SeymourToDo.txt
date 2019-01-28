@@ -1,0 +1,11 @@
+Models
+	* resize models to 1-1-1
+Lights
+	* move light
+	* turn on/off
+	* add lights to scene
+	* lit/unlit
+ Design
+ 	* make proper class properties private
+ 	* error checking uri
+ Cancel frames if another input
