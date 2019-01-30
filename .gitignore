@@ -12,6 +12,7 @@ seymour/res/noise/*.jpeg
 *.exe
 *.o
 *.so
+*.out
 
 # Packages #
 ############
