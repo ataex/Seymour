@@ -26,7 +26,7 @@ class Model : public Object3D
 public:
     /*  Functions   */
     // Constructor, expects a filepath to a 3D model.
-    Model( GLchar *path )
+    Model( const GLchar *path )
     {
         this->loadModel( path );
     }

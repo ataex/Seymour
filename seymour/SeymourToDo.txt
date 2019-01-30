@@ -1,5 +1,6 @@
 Models
 	* resize models to 1-1-1
+	* use mtl
 Lights
 	* move light
 	* turn on/off
@@ -7,5 +8,12 @@ Lights
 	* lit/unlit
  Design
  	* make proper class properties private
- 	* error checking uri
+ 	* error checking uri, alternative to uri
+ 		* have different uri paths that request dif things
+ 		* render with scene params
+ 		* light with changes to light settings
  Cancel frames if another input
+ Optimize
+ 	* read/write models to .bin
+ Front End
+ 	* scale input x y correctly

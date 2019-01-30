@@ -40,7 +40,7 @@ public:
     vector<GLuint> indices;
     vector<Texture> textures;
 
-    Shader* shader;    
+    // Shader* shader;    
     
     /*  Functions  */
     // Constructor
@@ -49,8 +49,6 @@ public:
         this->vertices = vertices;
         this->indices = indices;
         this->textures = textures;
-
-        this->shader = shader;
 
         // Now that we have all the required data, set the vertex buffers and its attribute pointers.
         this->setupMesh( );

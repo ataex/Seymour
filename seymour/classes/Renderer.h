@@ -45,7 +45,15 @@ public:
     const char* name;
     GLFWwindow* window;
     Shader* shader;
+
     int useTexture = 1;
+
+    int useLight[4] = {1, 0, 0, 0};
+    float lightPosition[4][3] = {
+        {2.0f, 2.0f, 3.0f}, 
+        {-2.0f, 2.0f, 3.0f}, 
+        {2.0f, -2.0f, 3.0f}, 
+        {-2.0f, -2.0f, 3.0f}};
 
     Renderer( int width, int height, string name="Renderer" ) {
         this->width = width;
@@ -85,13 +93,44 @@ public:
         // == ==========================
         
         // Point light 1
-        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[0].position" ), 2.0f, 2.0f, 3.0f );
+        glUniform1i( glGetUniformLocation( shader.Program, "useLightOne" ), useLight[0] );
+        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[0].position" ), lightPosition[0][0], lightPosition[0][1], lightPosition[0][2] );
         glUniform3f( glGetUniformLocation( shader.Program, "pointLights[0].ambient" ), 0.32f, 0.32f, 0.32f );
         glUniform3f( glGetUniformLocation( shader.Program, "pointLights[0].diffuse" ), 1.0f, 1.0f, 1.0f );
         glUniform3f( glGetUniformLocation( shader.Program, "pointLights[0].specular" ), 0.1f, 0.1f, 0.1f );
         glUniform1f( glGetUniformLocation( shader.Program, "pointLights[0].constant" ), 1.0f );
         glUniform1f( glGetUniformLocation( shader.Program, "pointLights[0].linear" ), 0.09f );
         glUniform1f( glGetUniformLocation( shader.Program, "pointLights[0].quadratic" ), 0.032f );
+
+        // Point light 2
+        glUniform1i( glGetUniformLocation( shader.Program, "useLightTwo" ), useLight[1] );
+        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[1].position" ), lightPosition[1][0], lightPosition[1][1], lightPosition[1][2] );
+        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[1].ambient" ), 0.32f, 0.32f, 0.32f );
+        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[1].diffuse" ), 1.0f, 1.0f, 0.0f );
+        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[1].specular" ), 0.1f, 0.1f, 0.1f );
+        glUniform1f( glGetUniformLocation( shader.Program, "pointLights[1].constant" ), 1.0f );
+        glUniform1f( glGetUniformLocation( shader.Program, "pointLights[1].linear" ), 0.09f );
+        glUniform1f( glGetUniformLocation( shader.Program, "pointLights[1].quadratic" ), 0.032f );
+
+        // Point light 3
+        glUniform1i( glGetUniformLocation( shader.Program, "useLightThree" ), useLight[2] );
+        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[2].position" ), lightPosition[2][0], lightPosition[2][1], lightPosition[2][2] );
+        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[2].ambient" ), 0.32f, 0.32f, 0.32f );
+        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[2].diffuse" ), 0.0f, 1.0f, 0.0f );
+        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[2].specular" ), 0.1f, 0.1f, 0.1f );
+        glUniform1f( glGetUniformLocation( shader.Program, "pointLights[2].constant" ), 1.0f );
+        glUniform1f( glGetUniformLocation( shader.Program, "pointLights[2].linear" ), 0.09f );
+        glUniform1f( glGetUniformLocation( shader.Program, "pointLights[2].quadratic" ), 0.032f );
+
+        // Point light 4
+        glUniform1i( glGetUniformLocation( shader.Program, "useLightFour" ), useLight[3] );
+        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[3].position" ), lightPosition[3][0], lightPosition[3][1], lightPosition[3][2] );
+        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[3].ambient" ), 0.32f, 0.32f, 0.32f );
+        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[3].diffuse" ), 0.0f, 1.0f, 1.0f );
+        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[3].specular" ), 0.1f, 0.1f, 0.1f );
+        glUniform1f( glGetUniformLocation( shader.Program, "pointLights[3].constant" ), 1.0f );
+        glUniform1f( glGetUniformLocation( shader.Program, "pointLights[3].linear" ), 0.09f );
+        glUniform1f( glGetUniformLocation( shader.Program, "pointLights[3].quadratic" ), 0.032f );
 
         for ( int i=0; i<scene->children.size(); i++ ) {
             // Draw the loaded model

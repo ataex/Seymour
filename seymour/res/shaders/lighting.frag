@@ -1,6 +1,6 @@
 #version 330 core
 
-#define NUMBER_OF_POINT_LIGHTS 1
+#define NUMBER_OF_POINT_LIGHTS 4
 
 struct Material
 {
@@ -54,11 +54,21 @@ in vec2 TexCoords;
 out vec4 color;
 
 uniform vec3 viewPos;
+
 uniform DirLight dirLight;
+
 uniform PointLight pointLights[NUMBER_OF_POINT_LIGHTS];
+uniform bool useLightOne;
+uniform bool useLightTwo;
+uniform bool useLightThree;
+uniform bool useLightFour;
+
 uniform SpotLight spotLight;
+
 uniform Material material;
+
 uniform bool useTexture;
+
 uniform vec3 fragColor;
 
 // Function prototypes
@@ -78,9 +88,17 @@ void main( )
     //result = CalcDirLight( dirLight, norm, viewDir );
     
     // Point lights
-    for ( int i = 0; i < NUMBER_OF_POINT_LIGHTS; i++ )
-    {
-        result += CalcPointLight( pointLights[i], norm, FragPos, viewDir );
+    if ( useLightOne ) {
+        result += CalcPointLight( pointLights[0], norm, FragPos, viewDir );
+    }
+    if ( useLightTwo ) {
+        result += CalcPointLight( pointLights[1], norm, FragPos, viewDir );
+    }
+    if ( useLightThree ) {
+        result += CalcPointLight( pointLights[2], norm, FragPos, viewDir );
+    }
+    if ( useLightFour ) {
+        result += CalcPointLight( pointLights[3], norm, FragPos, viewDir );
     }
     
     // Spot light
