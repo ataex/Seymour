@@ -65,8 +65,9 @@ int main(int argc, char **argv) {
     Scene scene;
     Camera camera(glm::vec3( 0.0f, 0.0f, 0.0f ), 45.0f);
     // Model ourModel( "res/models/XYZ_RGB_dragon/XYZ_RGB_dragon.obj" );
-    Model ourModel( "res/models/cube/cube.obj" );
-    // Model ourModel( "res/models/head_of_jupiter.obj" );
+    // Model ourModel( "res/models/cube/cube.obj" );
+    Model ourModel( "res/models/happy_recon/happy_final.obj" );
+    
     scene.add( &ourModel );
 
     float m[] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};

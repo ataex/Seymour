@@ -6,7 +6,6 @@
  -heavy use of copy assignment instead of pointer types,
  -unnecessary use of a newline before an opening curly brace.﻿
  */
-// what is pragma once?
 // code adapted from https://www.youtube.com/watch?v=ZbnEMM7vwmU
 
 // Std. Includes
@@ -48,6 +47,8 @@ public:
 
     int useTexture = 1;
 
+    GLuint noiseTextureId;
+
     int useLight[4] = {1, 0, 0, 0};
     float lightPosition[4][3] = {
         {2.0f, 2.0f, 3.0f}, 
@@ -64,6 +65,8 @@ public:
 
         Shader shader( "res/shaders/lighting.vs", "res/shaders/lighting.frag" );
         this->shader = &shader;
+
+        this->noiseTextureId = TextureLoader::TextureFromFile( "random0.jpg", "res/noise" );
     }
 
     void render( Scene *scene, Camera *camera ) {
@@ -131,6 +134,12 @@ public:
         glUniform1f( glGetUniformLocation( shader.Program, "pointLights[3].constant" ), 1.0f );
         glUniform1f( glGetUniformLocation( shader.Program, "pointLights[3].linear" ), 0.09f );
         glUniform1f( glGetUniformLocation( shader.Program, "pointLights[3].quadratic" ), 0.032f );
+
+        glActiveTexture( GL_TEXTURE0 + this->noiseTextureId );
+        // Now set the sampler to the correct texture unit
+        glUniform1i( glGetUniformLocation( shader.Program, ( "noiseTexture" ) ), this->noiseTextureId );
+        // And finally bind the texture
+        glBindTexture( GL_TEXTURE_2D, this->noiseTextureId );
 
         for ( int i=0; i<scene->children.size(); i++ ) {
             // Draw the loaded model

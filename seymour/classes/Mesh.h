@@ -81,7 +81,9 @@ public:
             
             number = ss.str( );
             // Now set the sampler to the correct texture unit
-            glUniform1i( glGetUniformLocation( shader.Program, ( name + number ).c_str( ) ), i );
+            // leifchri: is this necessary?
+            // glUniform1i( glGetUniformLocation( shader.Program, ( name + number ).c_str( ) ), i );
+            glUniform1i( glGetUniformLocation( shader.Program, "material.diffuse" ), i );
             // And finally bind the texture
             glBindTexture( GL_TEXTURE_2D, this->textures[i].id );
         }

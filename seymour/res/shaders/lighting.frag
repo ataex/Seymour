@@ -71,10 +71,14 @@ uniform bool useTexture;
 
 uniform vec3 fragColor;
 
+uniform sampler2D noiseTexture;
+
 // Function prototypes
 vec3 CalcDirLight( DirLight light, vec3 normal, vec3 viewDir );
 vec3 CalcPointLight( PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir );
 vec3 CalcSpotLight( SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir );
+
+float blend = 0.97; // blending factor for noise texture
 
 void main( )
 {
@@ -104,7 +108,7 @@ void main( )
     // Spot light
     //result += CalcSpotLight( spotLight, norm, FragPos, viewDir );
     
-    color = vec4( result, 1.0 );
+    color = (1.0 - blend) * texture( noiseTexture, FragPos.xy ) + blend * vec4( result, 1.0 );
 }
 
 // Calculates the color when using a directional light.
