@@ -24,6 +24,8 @@
 #include "Camera.h"
 #include "Model.h"
 #include "Scene.h"
+#include "Mesh.h"
+#include "MeshFactory.h"
 
 // GLM Mathemtics
 #include <glm/glm.hpp>
@@ -34,7 +36,6 @@
 
 // Other Libs
 #include "SOIL/SOIL.h"
-
 
 class Renderer {
 public:
@@ -47,7 +48,11 @@ public:
 
     int useTexture = 1;
 
+    GLuint renderedFramebuffer;
     GLuint noiseTextureId;
+    GLuint renderedTextureId;
+
+    Mesh* renderMesh;
 
     int useLight[4] = {1, 0, 0, 0};
     float lightPosition[4][3] = {
@@ -67,9 +72,18 @@ public:
         this->shader = &shader;
 
         this->noiseTextureId = TextureLoader::TextureFromFile( "random0.jpg", "res/noise" );
+        this->setupRenderToTexture();
     }
 
-    void render( Scene *scene, Camera *camera ) {
+    void render( Scene *scene, Camera *camera, Mesh *renderMesh = nullptr ) {
+        if (renderMesh == nullptr) {
+            // Render to render buffer
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);            
+        } else {
+            // Render to screen
+            glBindFramebuffer(GL_FRAMEBUFFER, this->renderedFramebuffer);
+        }
+
         glClearColor( 0.00f, 0.00f, 0.00f, 1.0f ); // make this a property
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
         Shader shader( "res/shaders/lighting.vs", "res/shaders/lighting.frag" );
@@ -135,12 +149,6 @@ public:
         glUniform1f( glGetUniformLocation( shader.Program, "pointLights[3].linear" ), 0.09f );
         glUniform1f( glGetUniformLocation( shader.Program, "pointLights[3].quadratic" ), 0.032f );
 
-        glActiveTexture( GL_TEXTURE0 + this->noiseTextureId );
-        // Now set the sampler to the correct texture unit
-        glUniform1i( glGetUniformLocation( shader.Program, ( "noiseTexture" ) ), this->noiseTextureId );
-        // And finally bind the texture
-        glBindTexture( GL_TEXTURE_2D, this->noiseTextureId );
-
         for ( int i=0; i<scene->children.size(); i++ ) {
             // Draw the loaded model
             glm::mat4 model = scene->children[i]->modelMatrix;
@@ -149,11 +157,53 @@ public:
             scene->children[i]->render( shader );
         }
 
+        if ( renderMesh != nullptr ) {
+            // Render to the screen 
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+            // glClearColor( 0.00f, 0.00f, 0.00f, 1.0f ); // make this a property
+            glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+            Shader shader2( "res/shaders/passthrough.vs", "res/shaders/blending.frag" );
+            shader2.use( ); // leifchri: does this need to be called every frame?
+
+            // Bind our noise texture
+            glActiveTexture( GL_TEXTURE0 + this->noiseTextureId );
+            // Now set the sampler to the correct texture unit
+            glUniform1i( glGetUniformLocation( shader2.Program, ( "noiseTexture" ) ), this->noiseTextureId );
+            // And finally bind the texture
+            glBindTexture( GL_TEXTURE_2D, this->noiseTextureId );
+
+            // Bind our texture in Texture Unit 0
+            glActiveTexture(GL_TEXTURE0 + this->renderedTextureId );
+            // Set our "renderedTextureId" sampler to use Texture Unit 0
+            glUniform1i( glGetUniformLocation( shader2.Program, ( "renderedTexture" ) ), this->renderedTextureId );
+            // And finally bind the texture
+            glBindTexture( GL_TEXTURE_2D, this->renderedTextureId );
+
+            // glm::mat4 model = renderMesh->modelMatrix;
+            // glUniformMatrix4fv( glGetUniformLocation( shader.Program, "model" ), 1, GL_FALSE, glm::value_ptr( model ) );
+            renderMesh->render( shader2 );
+        }
+
         // Swap the buffers
         glfwSwapBuffers( this->window );
     }
 
     void close() {
+        // Cleanup VBO and shader
+        // glDeleteBuffers(1, &vertexbuffer);
+        // glDeleteBuffers(1, &uvbuffer);
+        // glDeleteBuffers(1, &normalbuffer);
+        // glDeleteBuffers(1, &elementbuffer);
+        // glDeleteProgram(programID);
+        // glDeleteTextures(1, &Texture);
+
+        // glDeleteFramebuffers(1, &FramebufferName);
+        // glDeleteTextures(1, &renderedTextureId);
+        // glDeleteRenderbuffers(1, &depthrenderbuffer);
+        // glDeleteBuffers(1, &quad_vertexbuffer);
+        // glDeleteVertexArrays(1, &VertexArrayID);
+
         glfwTerminate();
     }
 
@@ -203,5 +253,60 @@ private:
         
         // OpenGL options
         glEnable( GL_DEPTH_TEST );
+
+        return 0;
+    }
+
+    int setupRenderToTexture() {
+        // ---------------------------------------------
+        // Render to Texture - specific code begins here
+        // ---------------------------------------------
+
+        // leifchri is this necessary? don't we have default framebuffer?
+        // The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
+        GLuint renderedFramebuffer;
+        glGenFramebuffers(1, &renderedFramebuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, renderedFramebuffer);
+        this->renderedFramebuffer = renderedFramebuffer;
+
+        // The texture we're going to render to
+        GLuint renderedTextureId;
+        glGenTextures(1, &renderedTextureId);
+        this->renderedTextureId = renderedTextureId;
+        
+        // "Bind" the newly created texture : all future texture functions will modify this texture
+        glBindTexture(GL_TEXTURE_2D, this->renderedTextureId);
+
+        // Give an empty image to OpenGL ( the last "0" means "empty" )
+        glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, this->screen_width, this->screen_height, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
+
+        // Poor filtering
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        // The depth buffer
+        GLuint depthrenderbuffer;
+        glGenRenderbuffers(1, &depthrenderbuffer);
+        glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, this->screen_width, this->screen_height);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
+
+        // Set "renderedTextureId" as our colour attachement #0
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, this->renderedTextureId, 0);
+
+        // Set the list of draw buffers.
+        GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+        glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
+
+        // Always check that our framebuffer is ok
+        if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            return EXIT_FAILURE;
+
+        Mesh quadMesh = MeshFactory::quadMesh(1.0f, 4, 1.0f, 4);
+        this->renderMesh = &quadMesh;
+
+        return 0;
     }
 };

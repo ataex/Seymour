@@ -2,3 +2,4 @@
 * looks to be because certain properties are missing from the mtl file
 * sometimes model wont move after light is moved
 	- the problem is that the browser caches the images
+* occasionally there are jumpy frames

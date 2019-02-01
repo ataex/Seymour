@@ -13,6 +13,9 @@ Lights
  		x render with scene params
  		x light with changes to light settings
  		* put into seperate function
+ 	* handle uniforms, especially lights better
+ 	* support multiple textures
+ 	* proper renderer cleanup
  Cancel frames if another input
  Optimize
  	* read/write models to .bin

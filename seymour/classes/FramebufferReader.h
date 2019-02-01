@@ -98,6 +98,7 @@ private:
 	    cinfo.input_components = 3;        /* # of color components per pixel */
 	    cinfo.in_color_space = JCS_RGB;     /* colorspace of input image */
 	    jpeg_set_defaults(&cinfo);
+	    jpeg_set_quality(&cinfo, 50, TRUE);
 	    /* Step 4: Start compressor */
 	    jpeg_start_compress(&cinfo, TRUE);
 	    /* Step 5: while (scan lines remain to be written) */

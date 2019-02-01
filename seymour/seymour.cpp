@@ -25,6 +25,7 @@
 #include "Model.h"
 #include "Renderer.h"
 #include "FramebufferReader.h"
+#include "MeshFactory.h"
 
 // GLM Mathemtics
 #include <glm/glm.hpp>
@@ -46,8 +47,14 @@
 
 using namespace std;
 
+bool debugFlag = false;
+int screenWidth = 800;
+int screenHeight = 600;
+
 // http://www.martinbroadhurst.com/how-to-split-a-string-in-c.html
 void split(const std::string& str, std::vector<std::string>& cont, char delim);
+string getRoute(string str);
+void getWords(string str, vector<string> &words);
 
 int main(int argc, char **argv) {
 	// Backup the stdio streambufs
@@ -60,22 +67,23 @@ int main(int argc, char **argv) {
     FCGX_Init();
     FCGX_InitRequest(&request, 0, 0);
     
-    Renderer renderer(800, 600);
+    Renderer renderer(screenWidth, screenHeight);
 
     Scene scene;
     Camera camera(glm::vec3( 0.0f, 0.0f, 0.0f ), 45.0f);
-    // Model ourModel( "res/models/XYZ_RGB_dragon/XYZ_RGB_dragon.obj" );
-    // Model ourModel( "res/models/cube/cube.obj" );
-    Model ourModel( "res/models/happy_recon/happy_final.obj" );
-    
-    scene.add( &ourModel );
+    // Model model1( "res/models/XYZ_RGB_dragon/XYZ_RGB_dragon.obj" );
+    // Model model1( "res/models/cube/cube.obj" );
+    Model model0( "res/models/happy_recon/happy_final.obj" );
+    scene.add( &model0 );
+    // scene.add( &model1 );
+
+    Mesh renderMesh = MeshFactory::quadMesh(1.0f, 4, 1.0f, 4);
 
     float m[] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
 
-    FramebufferReader framebufferReader(3, 800, 600);
+    FramebufferReader framebufferReader(3, screenWidth, screenHeight);
 
     // Game loop
-    // while ( true ) {        
     while (FCGX_Accept_r(&request) == 0) {
         fcgi_streambuf cin_fcgi_streambuf(request.in);
         fcgi_streambuf cout_fcgi_streambuf(request.out);
@@ -85,38 +93,32 @@ int main(int argc, char **argv) {
         cout.rdbuf(&cout_fcgi_streambuf);
         cerr.rdbuf(&cerr_fcgi_streambuf);    
 
+        if (debugFlag) {
+            std::cout << "Content-type: text/html\r\n\r\n";
+        }
+
         char * uri = FCGX_GetParam("REQUEST_URI", request.envp);
         std::string uri_str(uri);
 
-        // get route
-        char *temp1;
-        if (uri[0] == '/') {
-            temp1 = &uri[1];
-        }
-        string temp2(temp1);
-        int i = temp2.find('/');
-        temp2 = temp2.substr(i+1,temp2.length());
-        i = temp2.find('/');
-        string route = temp2.substr(0,i);
 
-        std::vector<std::string> words;
-        split(temp2.substr(i+1,temp2.length()), words, ',');
-        
+        string route = getRoute( uri );
+        vector<string> words;
+        getWords( uri, words );
+
         if ( route.compare("render") == 0 ) {
-            for (unsigned int j=0; j<16; j++) {
-                std::cout << (words[j]) << " ";
-                m[j] = std::stod(words[j]);
+            // setRenderParameters(words, m)
+            if (words.size() >= 18) {
+                for (unsigned int j=0; j<16; j++) {
+                    std::cout << (words[j]) << " ";
+                    m[j] = std::stod(words[j]);
+                }
+                camera.fov = std::stod(words[16]);
+                renderer.useTexture = std::stoi(words[17]);\
+            } else {
+                camera.fov = 45.0f;
+                renderer.useTexture = 1;
             }
-            camera.fov = std::stod(words[16]);
-            renderer.useTexture = std::stoi(words[17]);
-
-            // camera.fov = 45.0f;
-            // renderer.useTexture = 1;
-
-            // std::cout << "Content-type: text/html\r\n\r\n" << "1" << route;
         } else if ( route.compare("light") == 0 ) {
-                        // std::cout << "Content-type: text/html\r\n\r\n" << "ERROR: Invalid route: ";
-
             int i = 0;
             renderer.useLight[0] = std::stoi(words[i]);
             i++;
@@ -137,16 +139,16 @@ int main(int argc, char **argv) {
             std::cout << "Content-type: text/html\r\n\r\n" << "ERROR: Invalid route: " << route << std::endl;
         }
 
-        ourModel.modelMatrix = glm::make_mat4(m);
+        model0.modelMatrix = glm::make_mat4(m);
 
-        renderer.render( &scene, &camera );
+        renderer.render( &scene, &camera, &renderMesh );
 
-        std::cout << "Content-type: image/png\r\n\r\n";
-        framebufferReader.writeFrameToCout();
+        if (!debugFlag) {
+            std::cout << "Content-type: image/png\r\n\r\n";
+            framebufferReader.writeFrameToCout();
+        }
 
-        // std::cout << "Content-type: text/html\r\n\r\n" << route;
         std::cout << std::endl;
-        // std::cin.ignore();
     }
     
     renderer.close();
@@ -167,4 +169,30 @@ void split(const std::string& str, std::vector<std::string>& cont, char delim = 
     while (std::getline(ss, token, delim)) {
         cont.push_back(token);
     }
+}
+
+string getRoute(string str) {
+    char *temp1;
+    if (str[0] == '/') {
+        temp1 = &str[1];
+    }
+    string temp2(temp1);
+    int i = temp2.find('/');
+    temp2 = temp2.substr(i+1,temp2.length());
+    i = temp2.find('/');
+    string route = temp2.substr(0,i);
+
+    return route;
+}
+
+void getWords(string str, vector<string> &words) {
+    char *temp1;
+    if (str[0] == '/') {
+        temp1 = &str[1];
+    }
+    string temp2(temp1);
+    int i = temp2.find('/');
+    temp2 = temp2.substr(i+1,temp2.length());
+
+    split(temp2.substr(i+1,temp2.length()), words, ',');
 }
