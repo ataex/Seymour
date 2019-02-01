@@ -19,5 +19,6 @@
 - [ ] Cancel frames if another input
 ## Optimize
 - [ ] read/write models to .bin
+- [ ] stencil renderer
 ## Front End
 - [ ] scale input x y correctly
