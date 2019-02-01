@@ -68,8 +68,7 @@ public:
 
         this->setupRenderer();
 
-        Shader shader( "res/shaders/lighting.vs", "res/shaders/lighting.frag" );
-        this->shader = &shader;
+        this->shader = new Shader( "res/shaders/lighting.vs", "res/shaders/lighting.frag" );
 
         this->noiseTextureId = TextureLoader::TextureFromFile( "random0.jpg", "res/noise" );
         this->setupRenderToTexture();
@@ -86,22 +85,22 @@ public:
 
         glClearColor( 0.00f, 0.00f, 0.00f, 1.0f ); // make this a property
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-        Shader shader( "res/shaders/lighting.vs", "res/shaders/lighting.frag" );
-        shader.use( ); // leifchri: does this need to be called every frame?
+        // Shader shader( "res/shaders/lighting.vs", "res/shaders/lighting.frag" );
+        this->shader->use( ); // leifchri: does this need to be called every frame?
 
         // make this a function of the camera
         glm::mat4 projection = camera->projectionMatrix( this->screen_width, this->screen_height );//glm::perspective( 45.0f * (float)M_PI/180, ( float )this->screen_width/( float )this->screen_height, 0.1f, 2000.0f );
 
         glm::mat4 view = glm::translate(glm::mat4(1.0), glm::vec3(0.0f, 0.0f, -5.0f));
 
-        glUniformMatrix4fv( glGetUniformLocation( shader.Program, "projection" ), 1, GL_FALSE, glm::value_ptr( projection ) );
-        glUniformMatrix4fv( glGetUniformLocation( shader.Program, "view" ), 1, GL_FALSE, glm::value_ptr( view ) );
+        glUniformMatrix4fv( glGetUniformLocation( this->shader->program, "projection" ), 1, GL_FALSE, glm::value_ptr( projection ) );
+        glUniformMatrix4fv( glGetUniformLocation( this->shader->program, "view" ), 1, GL_FALSE, glm::value_ptr( view ) );
 
-        glUniform1i( glGetUniformLocation( shader.Program, "useTexture" ), this->useTexture );
-        glUniform3f( glGetUniformLocation( shader.Program, "fragColor" ), 0.66f, 0.66f, 0.66f );
+        glUniform1i( glGetUniformLocation( this->shader->program, "useTexture" ), this->useTexture );
+        glUniform3f( glGetUniformLocation( this->shader->program, "fragColor" ), 0.66f, 0.66f, 0.66f );
 
         // Set material properties
-        glUniform1f( glGetUniformLocation( shader.Program, "material.shininess" ), 32.0f );
+        glUniform1f( glGetUniformLocation( this->shader->program, "material.shininess" ), 32.0f );
         // == ==========================
         // Here we set all the uniforms for the 5/6 types of lights we have. We have to set them manually and index
         // the proper PointLight struct in the array to set each uniform variable. This can be done more code-friendly
@@ -110,51 +109,51 @@ public:
         // == ==========================
         
         // Point light 1
-        glUniform1i( glGetUniformLocation( shader.Program, "useLightOne" ), useLight[0] );
-        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[0].position" ), lightPosition[0][0], lightPosition[0][1], lightPosition[0][2] );
-        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[0].ambient" ), 0.32f, 0.32f, 0.32f );
-        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[0].diffuse" ), 1.0f, 1.0f, 1.0f );
-        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[0].specular" ), 0.1f, 0.1f, 0.1f );
-        glUniform1f( glGetUniformLocation( shader.Program, "pointLights[0].constant" ), 1.0f );
-        glUniform1f( glGetUniformLocation( shader.Program, "pointLights[0].linear" ), 0.09f );
-        glUniform1f( glGetUniformLocation( shader.Program, "pointLights[0].quadratic" ), 0.032f );
+        glUniform1i( glGetUniformLocation( this->shader->program, "useLightOne" ), useLight[0] );
+        glUniform3f( glGetUniformLocation( this->shader->program, "pointLights[0].position" ), lightPosition[0][0], lightPosition[0][1], lightPosition[0][2] );
+        glUniform3f( glGetUniformLocation( this->shader->program, "pointLights[0].ambient" ), 0.32f, 0.32f, 0.32f );
+        glUniform3f( glGetUniformLocation( this->shader->program, "pointLights[0].diffuse" ), 1.0f, 1.0f, 1.0f );
+        glUniform3f( glGetUniformLocation( this->shader->program, "pointLights[0].specular" ), 0.1f, 0.1f, 0.1f );
+        glUniform1f( glGetUniformLocation( this->shader->program, "pointLights[0].constant" ), 1.0f );
+        glUniform1f( glGetUniformLocation( this->shader->program, "pointLights[0].linear" ), 0.09f );
+        glUniform1f( glGetUniformLocation( this->shader->program, "pointLights[0].quadratic" ), 0.032f );
 
         // Point light 2
-        glUniform1i( glGetUniformLocation( shader.Program, "useLightTwo" ), useLight[1] );
-        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[1].position" ), lightPosition[1][0], lightPosition[1][1], lightPosition[1][2] );
-        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[1].ambient" ), 0.32f, 0.32f, 0.32f );
-        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[1].diffuse" ), 1.0f, 1.0f, 0.0f );
-        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[1].specular" ), 0.1f, 0.1f, 0.1f );
-        glUniform1f( glGetUniformLocation( shader.Program, "pointLights[1].constant" ), 1.0f );
-        glUniform1f( glGetUniformLocation( shader.Program, "pointLights[1].linear" ), 0.09f );
-        glUniform1f( glGetUniformLocation( shader.Program, "pointLights[1].quadratic" ), 0.032f );
+        glUniform1i( glGetUniformLocation( this->shader->program, "useLightTwo" ), useLight[1] );
+        glUniform3f( glGetUniformLocation( this->shader->program, "pointLights[1].position" ), lightPosition[1][0], lightPosition[1][1], lightPosition[1][2] );
+        glUniform3f( glGetUniformLocation( this->shader->program, "pointLights[1].ambient" ), 0.32f, 0.32f, 0.32f );
+        glUniform3f( glGetUniformLocation( this->shader->program, "pointLights[1].diffuse" ), 1.0f, 1.0f, 0.0f );
+        glUniform3f( glGetUniformLocation( this->shader->program, "pointLights[1].specular" ), 0.1f, 0.1f, 0.1f );
+        glUniform1f( glGetUniformLocation( this->shader->program, "pointLights[1].constant" ), 1.0f );
+        glUniform1f( glGetUniformLocation( this->shader->program, "pointLights[1].linear" ), 0.09f );
+        glUniform1f( glGetUniformLocation( this->shader->program, "pointLights[1].quadratic" ), 0.032f );
 
         // Point light 3
-        glUniform1i( glGetUniformLocation( shader.Program, "useLightThree" ), useLight[2] );
-        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[2].position" ), lightPosition[2][0], lightPosition[2][1], lightPosition[2][2] );
-        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[2].ambient" ), 0.32f, 0.32f, 0.32f );
-        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[2].diffuse" ), 0.0f, 1.0f, 0.0f );
-        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[2].specular" ), 0.1f, 0.1f, 0.1f );
-        glUniform1f( glGetUniformLocation( shader.Program, "pointLights[2].constant" ), 1.0f );
-        glUniform1f( glGetUniformLocation( shader.Program, "pointLights[2].linear" ), 0.09f );
-        glUniform1f( glGetUniformLocation( shader.Program, "pointLights[2].quadratic" ), 0.032f );
+        glUniform1i( glGetUniformLocation( this->shader->program, "useLightThree" ), useLight[2] );
+        glUniform3f( glGetUniformLocation( this->shader->program, "pointLights[2].position" ), lightPosition[2][0], lightPosition[2][1], lightPosition[2][2] );
+        glUniform3f( glGetUniformLocation( this->shader->program, "pointLights[2].ambient" ), 0.32f, 0.32f, 0.32f );
+        glUniform3f( glGetUniformLocation( this->shader->program, "pointLights[2].diffuse" ), 0.0f, 1.0f, 0.0f );
+        glUniform3f( glGetUniformLocation( this->shader->program, "pointLights[2].specular" ), 0.1f, 0.1f, 0.1f );
+        glUniform1f( glGetUniformLocation( this->shader->program, "pointLights[2].constant" ), 1.0f );
+        glUniform1f( glGetUniformLocation( this->shader->program, "pointLights[2].linear" ), 0.09f );
+        glUniform1f( glGetUniformLocation( this->shader->program, "pointLights[2].quadratic" ), 0.032f );
 
         // Point light 4
-        glUniform1i( glGetUniformLocation( shader.Program, "useLightFour" ), useLight[3] );
-        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[3].position" ), lightPosition[3][0], lightPosition[3][1], lightPosition[3][2] );
-        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[3].ambient" ), 0.32f, 0.32f, 0.32f );
-        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[3].diffuse" ), 0.0f, 1.0f, 1.0f );
-        glUniform3f( glGetUniformLocation( shader.Program, "pointLights[3].specular" ), 0.1f, 0.1f, 0.1f );
-        glUniform1f( glGetUniformLocation( shader.Program, "pointLights[3].constant" ), 1.0f );
-        glUniform1f( glGetUniformLocation( shader.Program, "pointLights[3].linear" ), 0.09f );
-        glUniform1f( glGetUniformLocation( shader.Program, "pointLights[3].quadratic" ), 0.032f );
+        glUniform1i( glGetUniformLocation( this->shader->program, "useLightFour" ), useLight[3] );
+        glUniform3f( glGetUniformLocation( this->shader->program, "pointLights[3].position" ), lightPosition[3][0], lightPosition[3][1], lightPosition[3][2] );
+        glUniform3f( glGetUniformLocation( this->shader->program, "pointLights[3].ambient" ), 0.32f, 0.32f, 0.32f );
+        glUniform3f( glGetUniformLocation( this->shader->program, "pointLights[3].diffuse" ), 0.0f, 1.0f, 1.0f );
+        glUniform3f( glGetUniformLocation( this->shader->program, "pointLights[3].specular" ), 0.1f, 0.1f, 0.1f );
+        glUniform1f( glGetUniformLocation( this->shader->program, "pointLights[3].constant" ), 1.0f );
+        glUniform1f( glGetUniformLocation( this->shader->program, "pointLights[3].linear" ), 0.09f );
+        glUniform1f( glGetUniformLocation( this->shader->program, "pointLights[3].quadratic" ), 0.032f );
 
         for ( int i=0; i<scene->children.size(); i++ ) {
             // Draw the loaded model
             glm::mat4 model = scene->children[i]->modelMatrix;
             // std::cout << glm::to_string(model) << std::endl;
-            glUniformMatrix4fv( glGetUniformLocation( shader.Program, "model" ), 1, GL_FALSE, glm::value_ptr( model ) );
-            scene->children[i]->render( shader );
+            glUniformMatrix4fv( glGetUniformLocation( this->shader->program, "model" ), 1, GL_FALSE, glm::value_ptr( model ) );
+            scene->children[i]->render( *this->shader );
         }
 
         if ( renderMesh != nullptr ) {
@@ -169,19 +168,19 @@ public:
             // Bind our noise texture
             glActiveTexture( GL_TEXTURE0 + this->noiseTextureId );
             // Now set the sampler to the correct texture unit
-            glUniform1i( glGetUniformLocation( shader2.Program, ( "noiseTexture" ) ), this->noiseTextureId );
+            glUniform1i( glGetUniformLocation( shader2.program, ( "noiseTexture" ) ), this->noiseTextureId );
             // And finally bind the texture
             glBindTexture( GL_TEXTURE_2D, this->noiseTextureId );
 
             // Bind our texture in Texture Unit 0
             glActiveTexture(GL_TEXTURE0 + this->renderedTextureId );
             // Set our "renderedTextureId" sampler to use Texture Unit 0
-            glUniform1i( glGetUniformLocation( shader2.Program, ( "renderedTexture" ) ), this->renderedTextureId );
+            glUniform1i( glGetUniformLocation( shader2.program, ( "renderedTexture" ) ), this->renderedTextureId );
             // And finally bind the texture
             glBindTexture( GL_TEXTURE_2D, this->renderedTextureId );
 
             // glm::mat4 model = renderMesh->modelMatrix;
-            // glUniformMatrix4fv( glGetUniformLocation( shader.Program, "model" ), 1, GL_FALSE, glm::value_ptr( model ) );
+            // glUniformMatrix4fv( glGetUniformLocation( this->shader->program, "model" ), 1, GL_FALSE, glm::value_ptr( model ) );
             renderMesh->render( shader2 );
         }
 
@@ -205,6 +204,7 @@ public:
         // glDeleteVertexArrays(1, &VertexArrayID);
 
         glfwTerminate();
+        free(this->shader);
     }
 
 private:

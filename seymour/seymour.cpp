@@ -152,7 +152,8 @@ int main(int argc, char **argv) {
     }
     
     renderer.close();
-    
+    free(framebufferReader);
+
     // restore stdio streambufs
     cin.rdbuf(cin_streambuf);
     cout.rdbuf(cout_streambuf);
