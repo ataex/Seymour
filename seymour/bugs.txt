@@ -3,3 +3,22 @@
 * sometimes model wont move after light is moved
 	- the problem is that the browser caches the images
 * occasionally there are jumpy frames
+* have to reload shader every render loop
+	- shader loads in Renderer just fine
+	- but once we get to the render function the shader is corrupted somehow
+		Renderer
+		(gdb) print shader
+		$1 = {Program = 3}
+		(gdb) print &shader
+		$2 = (Shader *) 0x7fffffffdbcc)
+		(gdb) print this->shader
+		$3 = (Shader *) 0x7fffffffdbcc
+		(gdb) print *this->shader
+		$4 = {Program = 3}
+	- corruption occurs soon after leaving scope of Renderer
+	- so it looks like the Shader shader being declared in Renderer is being freed, and thus overwritten later
+	- it was a scope issue, needed to declare Shader with new, or could use boost pointers https://stackoverflow.com/questions/1233361/c-variable-data-being-overwritten
+	https://www.boost.org/doc/libs/1_39_0/libs/smart_ptr/shared_ptr.htm
+* no error reporting from SOIL
+	- can't load jpg exported from GIMP
+	- https://stackoverflow.com/questions/31237600/soil-load-image-returns-null

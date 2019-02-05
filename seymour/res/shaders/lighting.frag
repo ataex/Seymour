@@ -110,6 +110,7 @@ void main( )
     
     //color = (1.0 - blend) * texture( noiseTexture, FragPos.xy ) + blend * vec4( result, 1.0 );
     color = vec4( result, 1.0 );
+    //color = vec4( 1.0, 0.0, 0.0, 1.0);
 }
 
 // Calculates the color when using a directional light.

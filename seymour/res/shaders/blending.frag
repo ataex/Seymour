@@ -9,7 +9,7 @@ out vec4 color;
 uniform sampler2D noiseTexture;
 uniform sampler2D renderedTexture;
 
-float blend = 0.97;
+float blend = 1.0;
 
 void main( )
 {

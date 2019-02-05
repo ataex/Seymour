@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
 
     Scene scene;
     Camera camera(glm::vec3( 0.0f, 0.0f, 0.0f ), 45.0f);
-    Model model0( "res/models/cube/cube.obj" );
+    Model model0( "res/models/zeus_ammon/zeus-ammon.obj" );
     scene.add( &model0 );
 
     Mesh renderMesh = MeshFactory::quadMesh(1.0f, 4, 1.0f, 4);

@@ -1,3 +1,6 @@
+#include <ctime>
+#include <string>
+#include <sstream>
 #include <jpeglib.h>
 
 class FramebufferReader {
@@ -26,8 +29,12 @@ public:
         // flip the image along the x-axis
         flipImage(this->pixels, this->screen_width, this->screen_height, this->imageSizeInBytes);
         
+        std::time_t t = std::time(0); 
+        std::stringstream ss;
+        ss << t;
+        string str = "./frames/frame" + ss.str() + ".jpeg";
         //writeJpeg(pixels, SCREEN_WIDTH, SCREEN_HEIGHT, filename);
-        writeJpeg(this->pixels, this->screen_width, this->screen_height, "./frame.jpeg");
+        writeJpeg(this->pixels, this->screen_width, this->screen_height, str);
 
         // vars for file reading
         FILE * pFile;
@@ -35,8 +42,9 @@ public:
         char * buffer;
         size_t result;
 
-        pFile = fopen ( "./frame.jpeg" , "rb" );
+        pFile = fopen ( str.c_str() , "rb" );
         if (pFile==NULL) {fputs ("File error",stderr); exit (1);}
+        std::cerr << "Open: " << fileno(pFile) << std::endl;
 
         // obtain file size:
         fseek (pFile , 0 , SEEK_END);
@@ -52,6 +60,9 @@ public:
         if (result != lSize) {fputs ("Reading error",stderr); exit (3);}
 
         std::cout << std::string(buffer,lSize);
+
+        std::cerr << "Close: " << fileno(pFile) << std::endl;
+        fclose (pFile);
 
         free(buffer);
     }
@@ -88,9 +99,11 @@ private:
 	    
 	    /* Step 2: specify data destination (eg, a file) */
 	    if ((outfile = fopen(filename.c_str(), "wb")) == NULL) {
-	        fprintf(stderr, "can't open %s\n", filename.c_str());
+	        fprintf(stderr, "ERROR %i: Can't open %s\n", errno, filename.c_str());
 	        exit(1);
 	    }
+	    std::cerr << "Open: " << fileno(outfile) << std::endl;
+
 	    jpeg_stdio_dest(&cinfo, outfile);
 	    /* Step 3: set parameters for compression */
 	    cinfo.image_width = windowWidth;     /* image width and height, in pixels */
@@ -98,7 +111,7 @@ private:
 	    cinfo.input_components = 3;        /* # of color components per pixel */
 	    cinfo.in_color_space = JCS_RGB;     /* colorspace of input image */
 	    jpeg_set_defaults(&cinfo);
-	    jpeg_set_quality(&cinfo, 50, TRUE);
+	    jpeg_set_quality(&cinfo, 90, TRUE); // was set to 50
 	    /* Step 4: Start compressor */
 	    jpeg_start_compress(&cinfo, TRUE);
 	    /* Step 5: while (scan lines remain to be written) */
@@ -110,7 +123,8 @@ private:
 	    }
 	    /* Step 6: Finish compression */
 	    jpeg_finish_compress(&cinfo);
-	    /* After finish_compress, we can close the output file. */
+	    /* After finish_compress, we can close the output file. */	    
+	    std::cerr << "Close: " << fileno(outfile) << std::endl;
 	    fclose(outfile);
 	    /* Step 7: release JPEG compression object */
 	    jpeg_destroy_compress(&cinfo);
