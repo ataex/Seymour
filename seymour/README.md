@@ -4,7 +4,7 @@
 ## Running the examples (under Linux)
 ### Installing Dependencies
 ```
-sudo apt-get install libglm-dev libglew-dev libglfw3-dev libsoil-dev libjpeg-dev libfcgi-dev spawn-fcgi nginx xvfb
+sudo apt-get install libglm-dev libglew-dev libglfw3-dev libsoil-dev libjpeg-dev libfcgi-dev spawn-fcgi nginx xvfb g++ libassimp-dev
 ```
 ### Backend - Compilation and Running
 ```
