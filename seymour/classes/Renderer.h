@@ -47,6 +47,9 @@ public:
     Shader* lightingShader;
     Shader* blendingShader;
 
+    float phi;
+    float theta;
+
     int useTexture = 1;
 
     GLuint renderedFramebuffer;
@@ -55,11 +58,11 @@ public:
 
     Mesh* renderMesh;
 
-    int useLight[4] = {1, 0, 0, 0};
+    int useLight[4] = {1, 1, 1, 0};
     float lightPosition[4][3] = {
         {2.0f, 2.0f, 3.0f}, 
-        {-2.0f, 2.0f, 3.0f}, 
-        {2.0f, -2.0f, 3.0f}, 
+        {-2.0f, 2.0f, -3.0f}, 
+        {0.0f, -3.0f, 0.0f}, 
         {-2.0f, -2.0f, 3.0f}};
 
     Renderer( int width, int height, string name="Renderer" ) {
@@ -74,6 +77,9 @@ public:
 
         this->noiseTextureId = TextureLoader::TextureFromFile( "random0.jpg", "res/noise" );
         this->setupRenderToTexture();
+
+        this->phi = 0.0;
+        this->theta = 0.0;
     }
 
     void render( Scene *scene, Camera *camera, Mesh *renderMesh = nullptr ) {
@@ -85,7 +91,7 @@ public:
             glBindFramebuffer(GL_FRAMEBUFFER, this->renderedFramebuffer);
         }
 
-        glClearColor( 0.00f, 0.00f, 0.00f, 1.0f ); // make this a property
+        glClearColor( 0.00f, 1.00f, 0.00f, 1.0f ); // make this a property
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
         // Shader shader( "res/shaders/lighting.vs", "res/shaders/lighting.frag" );
         this->lightingShader->use( ); // leifchri: does this need to be called every frame?
@@ -93,7 +99,7 @@ public:
         // make this a function of the camera
         glm::mat4 projection = camera->projectionMatrix( this->screen_width, this->screen_height );//glm::perspective( 45.0f * (float)M_PI/180, ( float )this->screen_width/( float )this->screen_height, 0.1f, 2000.0f );
 
-        glm::mat4 view = glm::translate(glm::mat4(1.0), glm::vec3(0.0f, 0.0f, -5.0f));
+        glm::mat4 view = glm::translate(glm::mat4(1.0), glm::vec3(0.0f, 0.0f, -5.0f)) * glm::rotate(glm::mat4(1.0), (float)glm::radians(this->theta), glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0), (float)glm::radians(this->phi), glm::vec3(1.0f, 0.0f, 0.0f));
 
         glUniformMatrix4fv( glGetUniformLocation( this->lightingShader->program, "projection" ), 1, GL_FALSE, glm::value_ptr( projection ) );
         glUniformMatrix4fv( glGetUniformLocation( this->lightingShader->program, "view" ), 1, GL_FALSE, glm::value_ptr( view ) );
@@ -123,8 +129,8 @@ public:
         // Point light 2
         glUniform1i( glGetUniformLocation( this->lightingShader->program, "useLightTwo" ), useLight[1] );
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[1].position" ), lightPosition[1][0], lightPosition[1][1], lightPosition[1][2] );
-        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[1].ambient" ), 0.32f, 0.32f, 0.32f );
-        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[1].diffuse" ), 1.0f, 1.0f, 0.0f );
+        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[1].ambient" ), 0.0f, 0.0f, 0.0f );
+        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[1].diffuse" ), 1.0f, 1.0f, 1.0f );
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[1].specular" ), 0.1f, 0.1f, 0.1f );
         glUniform1f( glGetUniformLocation( this->lightingShader->program, "pointLights[1].constant" ), 1.0f );
         glUniform1f( glGetUniformLocation( this->lightingShader->program, "pointLights[1].linear" ), 0.09f );
@@ -133,8 +139,8 @@ public:
         // Point light 3
         glUniform1i( glGetUniformLocation( this->lightingShader->program, "useLightThree" ), useLight[2] );
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[2].position" ), lightPosition[2][0], lightPosition[2][1], lightPosition[2][2] );
-        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[2].ambient" ), 0.32f, 0.32f, 0.32f );
-        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[2].diffuse" ), 0.0f, 1.0f, 0.0f );
+        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[2].ambient" ), 0.0f, 0.0f, 0.0f );
+        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[2].diffuse" ), 1.0f, 1.0f, 1.0f );
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[2].specular" ), 0.1f, 0.1f, 0.1f );
         glUniform1f( glGetUniformLocation( this->lightingShader->program, "pointLights[2].constant" ), 1.0f );
         glUniform1f( glGetUniformLocation( this->lightingShader->program, "pointLights[2].linear" ), 0.09f );

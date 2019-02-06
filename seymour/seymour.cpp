@@ -123,7 +123,9 @@ int main(int argc, char **argv) {
                     m[j] = std::stod(words[j]);
                 }
                 camera.fov = std::stod(words[16]);
-                renderer.useTexture = std::stoi(words[17]);\
+                renderer.useTexture = std::stoi(words[17]);
+                renderer.phi = std::stof(words[18]);
+                renderer.theta = std::stof(words[19]);
             } else {
                 camera.fov = 45.0f;
                 renderer.useTexture = 1;
@@ -152,7 +154,7 @@ int main(int argc, char **argv) {
         }
 
         // better way to deal with this? do we want to do model by model? or entire scene?
-        model0.modelMatrix = glm::make_mat4(m);
+        // model0.modelMatrix = glm::make_mat4(m);
 
         renderer.render( &scene, &camera, &renderMesh );
 

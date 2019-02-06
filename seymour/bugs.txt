@@ -22,3 +22,4 @@
 * no error reporting from SOIL
 	- can't load jpg exported from GIMP
 	- https://stackoverflow.com/questions/31237600/soil-load-image-returns-null
+* input def not scaled correctly, big (4096x4096) window results in super quick movement

@@ -1,4 +1,5 @@
 # Don't track these files, they're too big to upload
+seymour/*frames*.*
 seymour/frames
 seymour/res/models/happy_recon/
 seymour/res/models/XYZ_RGB_dragon/

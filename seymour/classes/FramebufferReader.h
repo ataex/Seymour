@@ -44,7 +44,7 @@ public:
 
         pFile = fopen ( str.c_str() , "rb" );
         if (pFile==NULL) {fputs ("File error",stderr); exit (1);}
-        std::cerr << "Open: " << fileno(pFile) << std::endl;
+        // std::cerr << "Open: " << fileno(pFile) << std::endl;
 
         // obtain file size:
         fseek (pFile , 0 , SEEK_END);
@@ -61,7 +61,7 @@ public:
 
         std::cout << std::string(buffer,lSize);
 
-        std::cerr << "Close: " << fileno(pFile) << std::endl;
+        // std::cerr << "Close: " << fileno(pFile) << std::endl;
         fclose (pFile);
 
         free(buffer);
@@ -102,7 +102,7 @@ private:
 	        fprintf(stderr, "ERROR %i: Can't open %s\n", errno, filename.c_str());
 	        exit(1);
 	    }
-	    std::cerr << "Open: " << fileno(outfile) << std::endl;
+	    // std::cerr << "Open: " << fileno(outfile) << std::endl;
 
 	    jpeg_stdio_dest(&cinfo, outfile);
 	    /* Step 3: set parameters for compression */
@@ -124,7 +124,7 @@ private:
 	    /* Step 6: Finish compression */
 	    jpeg_finish_compress(&cinfo);
 	    /* After finish_compress, we can close the output file. */	    
-	    std::cerr << "Close: " << fileno(outfile) << std::endl;
+	    // std::cerr << "Close: " << fileno(outfile) << std::endl;
 	    fclose(outfile);
 	    /* Step 7: release JPEG compression object */
 	    jpeg_destroy_compress(&cinfo);
