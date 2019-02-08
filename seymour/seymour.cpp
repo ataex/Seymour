@@ -44,15 +44,21 @@
 #include <algorithm>
 #include <iterator>
 #include <vector>
+#include <random>
+#include <openssl/md5.h>
 
 using namespace std;
 
 bool debugFlag = false;
-int screenWidth = 4096;
-int screenHeight = 4096;
+int screenWidth = 512;
+int screenHeight = 512;
 
 // http://www.martinbroadhurst.com/how-to-split-a-string-in-c.html
 void split(const std::string& str, std::vector<std::string>& cont, char delim);
+void swap(int* arr, int i, int j);
+void shuffle(int* arr, int start, int end);
+unsigned int getUIntHash(const char* s);
+glm::mat4 makeRandomMat(unsigned int seed);
 
 int main(int argc, char **argv) {
     // Backup the stdio streambufs
@@ -72,7 +78,7 @@ int main(int argc, char **argv) {
     // Model model1( "res/models/XYZ_RGB_dragon/XYZ_RGB_dragon.obj" );
     // Model model1( "res/models/cube/cube.obj" );
     // Model model0( "res/models/happy_recon/happy_final.obj" );
-    Model model0( "res/models/zeus_ammon/zeus-ammon.obj" );
+    Model model0( "res/models/antoninus_pious/antoninus_pious-5m.obj" );
     // scene.add( &model1 );
     scene.add( &model0 );
 
@@ -124,8 +130,9 @@ int main(int argc, char **argv) {
                 }
                 camera.fov = std::stod(words[16]);
                 renderer.useTexture = std::stoi(words[17]);
-                renderer.phi = std::stof(words[18]);
-                renderer.theta = std::stof(words[19]);
+                renderer.camX = std::stof(words[18]);
+                renderer.camY = std::stof(words[19]);
+                renderer.camZ = std::stof(words[20]);
             } else {
                 camera.fov = 45.0f;
                 renderer.useTexture = 1;
@@ -154,7 +161,9 @@ int main(int argc, char **argv) {
         }
 
         // better way to deal with this? do we want to do model by model? or entire scene?
-        // model0.modelMatrix = glm::make_mat4(m);
+        model0.modelMatrix = glm::make_mat4(m);
+        // unsigned int seed = getUIntHash(to_string(model0.modelMatrix).c_str());
+        // renderer.randomMatrix = makeRandomMat(seed);
 
         renderer.render( &scene, &camera, &renderMesh );
 
@@ -184,4 +193,114 @@ void split(const std::string& str, std::vector<std::string>& cont, char delim = 
     while (std::getline(ss, token, delim)) {
         cont.push_back(token);
     }
+}
+
+unsigned int getUIntHash(const char* s) {
+    unsigned char digest[MD5_DIGEST_LENGTH];
+    MD5((unsigned char*)&s, strlen(s), (unsigned char*)&digest);    
+    char mdString[33]; 
+    for(int i = 0; i < 8; i++) sprintf(&mdString[i*2], "%02x", (unsigned int)digest[i]);
+    unsigned int x = std::stoul(mdString, nullptr, 16);
+    return x;
+}
+
+void swap(int* arr, int i, int j) {
+    int temp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;
+}
+
+void shuffle(int* arr, int start, int end) {
+    for (int i=end+1; i>start; i--) {
+        int r = rand() % i;
+        swap(arr, i-1, r);
+    }
+}
+
+glm::mat4 makeRandomMat(unsigned int seed) {
+    std::cerr << "START makeRandomMat" << std::endl;
+    glm::mat4 out(1.0);
+    // return out;
+
+    srand(seed);
+    
+    std::default_random_engine gen;
+    std::uniform_real_distribution<double> d(0.0,1.0);
+
+    int order[] = {0, 1, 2};
+    shuffle(order, 0, 2);
+    for (int i=0; i<3; i++) {
+        std::cerr << order[i] << ",";
+    }
+    std::cerr << std::endl;
+
+    float max = 0.005;
+    glm::vec4 maxVector(1.0f, 1.0f, 1.0f, 1.0f);
+    int mode;
+    float dist, rx, ry, rz, theta, temp;
+    for (int i=0; i<3; i++) {
+        mode = order[i];
+        // generate a random point one the unit sphere
+        rx = d(gen);
+        ry = d(gen);
+        rz = d(gen);
+        temp = 1 / sqrt(rx*rx + ry*ry + rz*rz);
+        rx *= temp;
+        ry *= temp;
+        rz *= temp;
+        // generate the distance for the transfomration
+        dist = max * ( (float)rand() / (float)RAND_MAX );
+        max -= dist;
+
+        // will max vector always be the same?
+        std::cerr << "dist: " << dist << std::endl;
+        switch(mode) {
+            case 0:
+                std::cerr << "Translate" << std::endl;
+                rx *= dist;
+                ry *= dist;
+                rz *= dist;
+                std::cerr << rx << " " << ry << " " << rz << std::endl;
+                out = glm::translate(out, glm::vec3(rx, ry, rz));
+
+                maxVector.x += abs(rx);
+                maxVector.y += abs(ry);
+                maxVector.z += abs(rz);
+                break;
+            case 1:
+                std::cerr << "Rotate" << std::endl;
+                // use law of cosines to get angle in radians
+                // point that will move most is the corner of the, now potentially warped, unit sphere
+                // this point isn't necessarily maxVector, but it will have the same distance as maxVector
+                temp = glm::distance(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(maxVector.x, maxVector.y, maxVector.z));
+                theta = acos(1 - (dist*dist) / (2*temp*temp));
+                std::cerr << "theta: " << theta << std::endl;
+                out = glm::rotate(out, theta, glm::vec3(rx, ry, rz));
+
+                maxVector = out * maxVector;
+                break;
+            case 2:
+                std::cerr << "Scale" << std::endl;
+                rx = 1.0 + (rx * dist) / maxVector.x;
+                ry = 1.0 + (ry * dist) / maxVector.y;
+                rz = 1.0 + (rz * dist) / maxVector.z;
+                out = glm::scale(out, glm::vec3(rx, ry, rz));
+
+                maxVector.x *= rx;
+                maxVector.y *= ry;
+                maxVector.z *= rz;
+                break;
+            case 3:
+                std::cerr << "Shear" << std::endl;
+                break;
+            default:
+                break;
+        }
+    }
+
+    std::cerr << to_string(maxVector) << std::endl;
+    std::cerr << glm::distance(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(maxVector.x, maxVector.y, maxVector.z)) << std::endl;
+
+    std::cerr << "END makeRandomMat\n" << std::endl;
+    return out;
 }

@@ -4,13 +4,13 @@
 ## Running the examples (under Linux)
 ### Installing Dependencies
 ```
-sudo apt-get install libglm-dev libglew-dev libglfw3-dev libsoil-dev libjpeg-dev libfcgi-dev spawn-fcgi nginx xvfb g++ libassimp-dev
+sudo apt-get install libglm-dev libglew-dev libglfw3-dev libsoil-dev libjpeg-dev libfcgi-dev spawn-fcgi nginx xvfb g++ libassimp-dev openssl libssl-dev
 ```
 ### Backend - Compilation and Running
 ```
 # first cd into the Seymour_v2/seymour directory
 # compile seymour_backend 
-g++ -I ./classes seymour.cpp -lGL -lGLEW -lglfw -lSOIL -lassimp -ljpeg -lfcgi++ -lfcgi -o seymour_backend.o
+g++ -I ./classes seymour.cpp -lGL -lGLEW -lglfw -lSOIL -lassimp -ljpeg -lfcgi++ -lfcgi -libssl-dev -lssl -lcrypto -o seymour_backend.o
 # run with spawn-fcgi
 spawn-fcgi -p 8000 -n ./seymour_backend.o
 

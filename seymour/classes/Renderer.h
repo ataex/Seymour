@@ -58,6 +58,12 @@ public:
 
     Mesh* renderMesh;
 
+    float camX;
+    float camY;
+    float camZ;
+
+    glm::mat4 randomMatrix;
+
     int useLight[4] = {1, 1, 1, 0};
     float lightPosition[4][3] = {
         {2.0f, 2.0f, 3.0f}, 
@@ -78,8 +84,11 @@ public:
         this->noiseTextureId = TextureLoader::TextureFromFile( "random0.jpg", "res/noise" );
         this->setupRenderToTexture();
 
-        this->phi = 0.0;
-        this->theta = 0.0;
+        this->camX;
+        this->camY;
+        this->camZ;
+
+        this->randomMatrix = glm::mat4(1.0);
     }
 
     void render( Scene *scene, Camera *camera, Mesh *renderMesh = nullptr ) {
@@ -99,7 +108,7 @@ public:
         // make this a function of the camera
         glm::mat4 projection = camera->projectionMatrix( this->screen_width, this->screen_height );//glm::perspective( 45.0f * (float)M_PI/180, ( float )this->screen_width/( float )this->screen_height, 0.1f, 2000.0f );
 
-        glm::mat4 view = glm::translate(glm::mat4(1.0), glm::vec3(0.0f, 0.0f, -5.0f)) * glm::rotate(glm::mat4(1.0), (float)glm::radians(this->theta), glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0), (float)glm::radians(this->phi), glm::vec3(1.0f, 0.0f, 0.0f));
+        glm::mat4 view = this->randomMatrix * glm::lookAt(glm::vec3(this->camX, this->camY, this->camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
         glUniformMatrix4fv( glGetUniformLocation( this->lightingShader->program, "projection" ), 1, GL_FALSE, glm::value_ptr( projection ) );
         glUniformMatrix4fv( glGetUniformLocation( this->lightingShader->program, "view" ), 1, GL_FALSE, glm::value_ptr( view ) );
