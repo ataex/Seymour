@@ -1,12 +1,12 @@
 # Don't track these files, they're too big to upload
-seymour/*frames*.*
-seymour/frames
-seymour/res/models/happy_recon/
-seymour/res/models/XYZ_RGB_dragon/
-seymour/res/models/zeus_ammon/
-seymour/res/models/antoninus_pious/
-seymour/frame.jpeg
-seymour/res/noise/*.jpeg
+server/*frames*.*
+server/frames/
+server/res/models/happy_recon/
+server/res/models/XYZ_RGB_dragon/
+server/res/models/zeus_ammon/
+server/res/models/antoninus_pious/
+server/frame.jpeg
+server/res/noise/*.jpeg
 
 # Compiled source #
 ###################
