@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Demo Viewer</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #fff;
+				/*color: #fff;*/
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+			}
+			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+		</style>
+	</head>
+
+	<body oncontextmenu="return false;">
+		<div id="webgl-container"></div>
+		<input type="checkbox" id="client-texture"><span>Client Texture</span><br>
+		<input type="checkbox" id="server-texture"><span>Server Texture</span><br>
+		<button type="button" onclick="gatherFrames(0);">Start Gather</button>
+		<button type="button" onclick="stopGatherFrames();">Stop Gather</button><br>
+
+		<div id="frames-print"></div>
+
+		<script src="js/three.js"></script>
+		<script src="js/hammer.js"></script>
+
+		<script src="js/loaders/DDSLoader.js"></script>
+		<script src="js/loaders/MTLLoader.js"></script>
+		<script src="js/loaders/OBJLoader.js"></script>
+
+		<script src="js/demo.js"></script>
+	</body>
+</html>
