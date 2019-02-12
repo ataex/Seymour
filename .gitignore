@@ -7,6 +7,8 @@ server/res/models/zeus_ammon/
 server/res/models/antoninus_pious/
 server/frame.jpeg
 server/res/noise/*.jpeg
+server/res/noise/*.jpg
+client/frame-gather.html
 
 # Compiled source #
 ###################

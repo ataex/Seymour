@@ -26,6 +26,7 @@
 #include "Renderer.h"
 #include "FramebufferReader.h"
 #include "MeshFactory.h"
+#include "TextureLoader.h"
 
 // GLM Mathemtics
 #include <glm/glm.hpp>
@@ -50,8 +51,8 @@
 using namespace std;
 
 bool debugFlag = false;
-int screenWidth = 512;
-int screenHeight = 512;
+int screenWidth = 4096;
+int screenHeight = 4096;
 
 // http://www.martinbroadhurst.com/how-to-split-a-string-in-c.html
 void split(const std::string& str, std::vector<std::string>& cont, char delim);
@@ -78,7 +79,7 @@ int main(int argc, char **argv) {
     // Model model1( "res/models/XYZ_RGB_dragon/XYZ_RGB_dragon.obj" );
     // Model model1( "res/models/cube/cube.obj" );
     // Model model0( "res/models/happy_recon/happy_final.obj" );
-    Model model0( "res/models/antoninus_pious/antoninus_pious-5m.obj" );
+    Model model0( "res/models/antoninus_pious/antoninus-pious-5m.obj" );
     // scene.add( &model1 );
     scene.add( &model0 );
 
@@ -162,8 +163,11 @@ int main(int argc, char **argv) {
 
         // better way to deal with this? do we want to do model by model? or entire scene?
         model0.modelMatrix = glm::make_mat4(m);
-        // unsigned int seed = getUIntHash(to_string(model0.modelMatrix).c_str());
-        // renderer.randomMatrix = makeRandomMat(seed);
+        unsigned int seed = getUIntHash(to_string(model0.modelMatrix).c_str());
+        srand(seed);
+        // int r = rand() % 400;
+        // renderer.noiseTextureId = TextureLoader::TextureFromFile( string("random" +to_string(r)+ ".jpg").c_str(), "res/noise" );
+        renderer.randomMatrix = makeRandomMat(seed);
 
         renderer.render( &scene, &camera, &renderMesh );
 
@@ -218,24 +222,26 @@ void shuffle(int* arr, int start, int end) {
 }
 
 glm::mat4 makeRandomMat(unsigned int seed) {
-    std::cerr << "START makeRandomMat" << std::endl;
+    // std::cerr << "START makeRandomMat" << std::endl;
     glm::mat4 out(1.0);
     // return out;
 
     srand(seed);
+    // std::cerr << "Seed: " << seed << std::endl;
     
     std::default_random_engine gen;
     std::uniform_real_distribution<double> d(0.0,1.0);
 
     int order[] = {0, 1, 2};
     shuffle(order, 0, 2);
-    for (int i=0; i<3; i++) {
-        std::cerr << order[i] << ",";
-    }
-    std::cerr << std::endl;
+    // for (int i=0; i<3; i++) {
+    //     std::cerr << order[i] << ",";
+    // }
+    // std::cerr << std::endl;
 
-    float max = 0.005;
+    float max = 0.02;
     glm::vec4 maxVector(1.0f, 1.0f, 1.0f, 1.0f);
+    glm::mat4 tempMat(1.0);
     int mode;
     float dist, rx, ry, rz, theta, temp;
     for (int i=0; i<3; i++) {
@@ -252,43 +258,59 @@ glm::mat4 makeRandomMat(unsigned int seed) {
         dist = max * ( (float)rand() / (float)RAND_MAX );
         max -= dist;
 
+        glm::vec3 tempV;
         // will max vector always be the same?
-        std::cerr << "dist: " << dist << std::endl;
+        // std::cerr << "NEXT" << std::endl;
+        // std::cerr << "dist: " << dist << std::endl;
         switch(mode) {
             case 0:
-                std::cerr << "Translate" << std::endl;
+                // std::cerr << "Translate" << std::endl;
                 rx *= dist;
                 ry *= dist;
                 rz *= dist;
-                std::cerr << rx << " " << ry << " " << rz << std::endl;
+                // std::cerr << "rx:" << rx << " ry:" << ry << " rz" << rz << std::endl;
                 out = glm::translate(out, glm::vec3(rx, ry, rz));
 
+                tempV = glm::vec3(maxVector.x, maxVector.y, maxVector.z);
                 maxVector.x += abs(rx);
                 maxVector.y += abs(ry);
                 maxVector.z += abs(rz);
+                // std::cerr << "maxVector: " << to_string(maxVector) << std::endl;
+                // std::cerr << "new dist:" << glm::distance(tempV, glm::vec3(maxVector.x, maxVector.y, maxVector.z)) << std::endl;
+                // std::cerr << "sum dist: " << glm::distance(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(maxVector.x, maxVector.y, maxVector.z)) << std::endl;
                 break;
             case 1:
-                std::cerr << "Rotate" << std::endl;
+                // std::cerr << "Rotate" << std::endl;
                 // use law of cosines to get angle in radians
                 // point that will move most is the corner of the, now potentially warped, unit sphere
                 // this point isn't necessarily maxVector, but it will have the same distance as maxVector
                 temp = glm::distance(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(maxVector.x, maxVector.y, maxVector.z));
                 theta = acos(1 - (dist*dist) / (2*temp*temp));
-                std::cerr << "theta: " << theta << std::endl;
-                out = glm::rotate(out, theta, glm::vec3(rx, ry, rz));
+                // std::cerr << "theta: " << theta << std::endl;
+                tempMat = glm::rotate(glm::mat4(1.0), theta, glm::vec3(rx, ry, rz));
+                out = tempMat * out;
 
-                maxVector = out * maxVector;
+                tempV = glm::vec3(maxVector.x, maxVector.y, maxVector.z);
+                maxVector = tempMat * maxVector;
+                // std::cerr << "maxVector: " << to_string(maxVector) << std::endl;
+                // std::cerr << "new dist:" << glm::distance(tempV, glm::vec3(maxVector.x, maxVector.y, maxVector.z)) << std::endl;
+                // std::cerr << "sum dist: " << glm::distance(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(maxVector.x, maxVector.y, maxVector.z)) << std::endl;
                 break;
             case 2:
-                std::cerr << "Scale" << std::endl;
+                // std::cerr << "Scale" << std::endl;
                 rx = 1.0 + (rx * dist) / maxVector.x;
                 ry = 1.0 + (ry * dist) / maxVector.y;
                 rz = 1.0 + (rz * dist) / maxVector.z;
+                // std::cerr << "rx:" << rx << " ry:" << ry << " rz:" << rz << std::endl;
                 out = glm::scale(out, glm::vec3(rx, ry, rz));
 
+                tempV = glm::vec3(maxVector.x, maxVector.y, maxVector.z);
                 maxVector.x *= rx;
                 maxVector.y *= ry;
                 maxVector.z *= rz;
+                // std::cerr << "maxVector: " << to_string(maxVector) << std::endl;
+                // std::cerr << "new dist:" << glm::distance(tempV, glm::vec3(maxVector.x, maxVector.y, maxVector.z)) << std::endl;
+                // std::cerr << "sum dist: " << glm::distance(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(maxVector.x, maxVector.y, maxVector.z)) << std::endl;
                 break;
             case 3:
                 std::cerr << "Shear" << std::endl;
@@ -298,9 +320,14 @@ glm::mat4 makeRandomMat(unsigned int seed) {
         }
     }
 
-    std::cerr << to_string(maxVector) << std::endl;
-    std::cerr << glm::distance(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(maxVector.x, maxVector.y, maxVector.z)) << std::endl;
+    // std::cerr << "Result: " << to_string(maxVector) << std::endl;
+    // std::cerr << glm::distance(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(maxVector.x, maxVector.y, maxVector.z)) << std::endl;
+    float final = glm::distance(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(maxVector.x, maxVector.y, maxVector.z));
 
-    std::cerr << "END makeRandomMat\n" << std::endl;
+    // if (final > 0.01) {
+    //     std::cerr << "ERROR::seed " << seed << " " << final << endl;
+    // }
+
+    // std::cerr << "END makeRandomMat\n" << std::endl;
     return out;
 }

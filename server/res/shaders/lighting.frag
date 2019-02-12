@@ -109,8 +109,9 @@ void main( )
     //result += CalcSpotLight( spotLight, norm, FragPos, viewDir );
     
     //color = (1.0 - blend) * texture( noiseTexture, FragPos.xy ) + blend * vec4( result, 1.0 );
-    color = vec4( result, 1.0 );
+    // color = vec4( result, 1.0 );
     //color = vec4( 1.0, 0.0, 0.0, 1.0);
+    color = texture( material.specular, TexCoords );
 }
 
 // Calculates the color when using a directional light.
