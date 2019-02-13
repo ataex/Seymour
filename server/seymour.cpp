@@ -51,8 +51,8 @@
 using namespace std;
 
 bool debugFlag = false;
-int screenWidth = 4096;
-int screenHeight = 4096;
+int screenWidth = 1024;
+int screenHeight = 1024;
 
 // http://www.martinbroadhurst.com/how-to-split-a-string-in-c.html
 void split(const std::string& str, std::vector<std::string>& cont, char delim);
@@ -73,13 +73,13 @@ int main(int argc, char **argv) {
     FCGX_InitRequest(&request, 0, 0);
     
     Renderer renderer(screenWidth, screenHeight);
+    renderer.clearColor = glm::vec4( 0.0, 0.0, 0.0, 1.0 );
 
     Scene scene;
     Camera camera(glm::vec3( 0.0f, 0.0f, 0.0f ), 45.0f);
-    // Model model1( "res/models/XYZ_RGB_dragon/XYZ_RGB_dragon.obj" );
     // Model model1( "res/models/cube/cube.obj" );
-    // Model model0( "res/models/happy_recon/happy_final.obj" );
-    Model model0( "res/models/antoninus_pious/antoninus-pious-5m.obj" );
+    // Model model0( "res/models/antoninus_pious/antoninus-pious-5m.obj" );
+    Model model0( "res/models/sphere/sphere.obj" );
     // scene.add( &model1 );
     scene.add( &model0 );
 
@@ -167,7 +167,7 @@ int main(int argc, char **argv) {
         srand(seed);
         // int r = rand() % 400;
         // renderer.noiseTextureId = TextureLoader::TextureFromFile( string("random" +to_string(r)+ ".jpg").c_str(), "res/noise" );
-        renderer.randomMatrix = makeRandomMat(seed);
+        // renderer.randomMatrix = makeRandomMat(seed);
 
         renderer.render( &scene, &camera, &renderMesh );
 
