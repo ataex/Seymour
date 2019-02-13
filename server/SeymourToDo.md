@@ -17,6 +17,7 @@
 - [ ] support multiple textures
 - [ ] proper renderer cleanup
 - [ ] Cancel frames if another input
+- [ ] Write png and jpeg
 ## Optimize
 - [ ] read/write models to .bin
 - [ ] stencil renderer

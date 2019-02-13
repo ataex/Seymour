@@ -2,18 +2,17 @@
 #include <string>
 #include <sstream>
 #include <jpeglib.h>
+#include "lodepng.h"
 
 class FramebufferReader {
 public:
-	// Image writting
-    size_t bytesPerPixel;// = 3;    // RGB
-    size_t imageSizeInBytes;// = bytesPerPixel * size_t(SCREEN_WIDTH) * size_t(SCREEN_HEIGHT);
-    unsigned char* pixels;// = static_cast<unsigned char*>(malloc(imageSizeInBytes));
-    int screen_width;
-    int screen_height;
-
-    FramebufferReader( size_t bytesPerPixel, int screen_width, int screen_height ) {
-    	this->bytesPerPixel = bytesPerPixel;
+    FramebufferReader( string extension, int screen_width, int screen_height ) {
+    	this->extension = extension;
+    	if (this->extension.compare("png") == 0) {
+    		this->bytesPerPixel = 4;
+    	} else {
+	    	this->bytesPerPixel = 3;
+    	}
     	this->screen_width = screen_width;
     	this->screen_height = screen_height;
     	this->imageSizeInBytes = bytesPerPixel * size_t(this->screen_width) * size_t(this->screen_height);
@@ -23,8 +22,13 @@ public:
     void writeFrameToCout() {
     	// Read the pixels from the frame buffer
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
-        glReadPixels(0, 0, this->screen_width, this->screen_height, GL_RGB, GL_UNSIGNED_BYTE, this->pixels);
-        
+
+    	if (this->extension.compare("png") == 0) {
+	        glReadPixels(0, 0, this->screen_width, this->screen_height, GL_RGBA, GL_UNSIGNED_BYTE, this->pixels);
+    	} else {
+        	glReadPixels(0, 0, this->screen_width, this->screen_height, GL_RGB, GL_UNSIGNED_BYTE, this->pixels);
+        }
+
         // leifchri: is there not a faster way to do this? Why doesn't the frame buffer draw flipped?
         // flip the image along the x-axis
         flipImage(this->pixels, this->screen_width, this->screen_height, this->imageSizeInBytes);
@@ -32,9 +36,15 @@ public:
         std::time_t t = std::time(0); 
         std::stringstream ss;
         ss << t;
-        string str = "./frames/frame" + ss.str() + ".jpeg";
-        //writeJpeg(pixels, SCREEN_WIDTH, SCREEN_HEIGHT, filename);
-        writeJpeg(this->pixels, this->screen_width, this->screen_height, str);
+        string str;
+    
+    	if (this->extension.compare("png") == 0) {
+	    	str = "./frames/frame" + ss.str() + ".png";
+    		writePng(this->pixels, this->screen_width, this->screen_height, str);
+    	} else {
+	    	str = "./frames/frame" + ss.str() + ".jpeg";
+	        writeJpeg(this->pixels, this->screen_width, this->screen_height, str);
+		}
 
         // vars for file reading
         FILE * pFile;
@@ -72,11 +82,18 @@ public:
     }
 
 private:
+	string extension;
+	size_t bytesPerPixel;// 3 = RGB, 4 = RGBA
+    size_t imageSizeInBytes;// = bytesPerPixel * size_t(SCREEN_WIDTH) * size_t(SCREEN_HEIGHT);
+    unsigned char* pixels;// = static_cast<unsigned char*>(malloc(imageSizeInBytes));
+    int screen_width;
+    int screen_height;
+
 	void flipImage(unsigned char* pixels, int screenWidth, int screenHeight, size_t imageSizeInBytes) {
 	    for (int row=0; row<(screenHeight/2); row++) {
-	        for (int i=0; i<screenWidth*3; i++) {
-	            int index1 = screenWidth*3*row + i;
-	            int index2 = int(imageSizeInBytes - screenWidth*3*(row+1) + i);
+	        for (int i=0; i<screenWidth*this->bytesPerPixel; i++) {
+	            int index1 = screenWidth*this->bytesPerPixel*row + i;
+	            int index2 = int(imageSizeInBytes - screenWidth*this->bytesPerPixel*(row+1) + i);
 	            unsigned char temp = pixels[index1];
 	            pixels[index1] = pixels[index2];
 	            pixels[index2] = temp;
@@ -128,7 +145,12 @@ private:
 	    fclose(outfile);
 	    /* Step 7: release JPEG compression object */
 	    jpeg_destroy_compress(&cinfo);
-	    
-	    return;
+	}
+
+	void writePng(unsigned char* pixels, int width, int height, std::string filename) {
+		//Encode the image
+		unsigned error = lodepng::encode(filename.c_str(), pixels, width, height);
+		//if there's an error, display it
+		if(error) std::cout << "encoder error " << error << ": "<< lodepng_error_text(error) << std::endl;
 	}
 };

@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
 
     float m[] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
 
-    FramebufferReader framebufferReader(3, screenWidth, screenHeight);
+    FramebufferReader framebufferReader("png", screenWidth, screenHeight);
 
     // Game loop
     while (FCGX_Accept_r(&request) == 0) {
