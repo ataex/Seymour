@@ -78,8 +78,8 @@ int main(int argc, char **argv) {
     Scene scene;
     Camera camera(glm::vec3( 0.0f, 0.0f, 0.0f ), 45.0f);
     // Model model1( "res/models/cube/cube.obj" );
-    // Model model0( "res/models/antoninus_pious/antoninus-pious-5m.obj" );
-    Model model0( "res/models/sphere/sphere.obj" );
+    Model model0( "res/models/antoninus_pious/antoninus-pious-5m.obj" );
+    // Model model0( "res/models/sphere/sphere.obj" );
     // scene.add( &model1 );
     scene.add( &model0 );
 
