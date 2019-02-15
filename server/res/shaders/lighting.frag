@@ -108,11 +108,6 @@ void main( )
     // Spot light
     //result += CalcSpotLight( spotLight, norm, FragPos, viewDir );
     
-    // Test stuff
-    //color = (1.0 - blend) * texture( noiseTexture, FragPos.xy ) + blend * vec4( result, 1.0 );
-    //color = vec4( 1.0, 0.0, 0.0, 1.0);
-    //color = texture( material.specular, TexCoords );
-    
     // Normal Map
     // color = vec4( norm, 1.0 );
     // Geometry Mask
