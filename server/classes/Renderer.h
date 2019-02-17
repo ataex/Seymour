@@ -73,6 +73,8 @@ public:
         {0.0f, -3.0f, 0.0f}, 
         {-2.0f, -2.0f, 3.0f}};
 
+    float blendNoisePerc;
+
     Renderer( int width, int height, string name="Renderer" ) {
         this->width = width;
         this->height = height;
@@ -93,6 +95,7 @@ public:
         this->randomMatrix = glm::mat4(1.0);
 
         this->clearColor = glm::vec4( 0.00f, 1.00f, 0.00f, 1.0f );
+        this->blendNoisePerc = 0.9;
     }
 
     void render( Scene *scene, Camera *camera, Mesh *renderMesh = nullptr ) {
@@ -132,7 +135,7 @@ public:
         // Point light 1
         glUniform1i( glGetUniformLocation( this->lightingShader->program, "useLightOne" ), useLight[0] );
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].position" ), lightPosition[0][0], lightPosition[0][1], lightPosition[0][2] );
-        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].ambient" ), 0.f, 0.f, 0.f ); // 0.32f, 0.32f, 0.32f
+        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].ambient" ), 0.32f, 0.32f, 0.32f ); // 0.32f, 0.32f, 0.32f
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].diffuse" ), 1.0f, 1.0f, 1.0f );
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].specular" ), 0.1f, 0.1f, 0.1f );
         glUniform1f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].constant" ), 1.0f );
@@ -184,6 +187,8 @@ public:
             // glClearColor( 0.00f, 0.00f, 0.00f, 1.0f ); // make this a property
             glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
             this->blendingShader->use( ); // leifchri: does this need to be called every frame?
+
+            glUniform1f( glGetUniformLocation( this->blendingShader->program, "blend" ), this->blendNoisePerc );
 
             // Bind our noise texture
             glActiveTexture( GL_TEXTURE0 + this->noiseTextureId );
