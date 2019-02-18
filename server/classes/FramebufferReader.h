@@ -6,6 +6,8 @@
 
 class FramebufferReader {
 public:
+	int jpegQuality = 90;
+
     FramebufferReader( string extension, int screen_width, int screen_height ) {
     	this->extension = extension;
     	if (this->extension.compare("png") == 0) {
@@ -128,7 +130,7 @@ private:
 	    cinfo.input_components = 3;        /* # of color components per pixel */
 	    cinfo.in_color_space = JCS_RGB;     /* colorspace of input image */
 	    jpeg_set_defaults(&cinfo);
-	    jpeg_set_quality(&cinfo, 90, TRUE); // was set to 50
+	    jpeg_set_quality(&cinfo, this->jpegQuality, TRUE); // was set to 50
 	    /* Step 4: Start compressor */
 	    jpeg_start_compress(&cinfo, TRUE);
 	    /* Step 5: while (scan lines remain to be written) */
