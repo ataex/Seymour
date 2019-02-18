@@ -95,7 +95,7 @@ public:
         this->randomMatrix = glm::mat4(1.0);
 
         this->clearColor = glm::vec4( 0.00f, 1.00f, 0.00f, 1.0f );
-        this->blendNoisePerc = 0.9;
+        this->blendNoisePerc = 0.75;
     }
 
     void render( Scene *scene, Camera *camera, Mesh *renderMesh = nullptr ) {
@@ -108,7 +108,7 @@ public:
         }
 
         glClearColor( this->clearColor.x, this->clearColor.y, this->clearColor.z, this->clearColor.w ); // make this a property
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
         // Shader shader( "res/shaders/lighting.vs", "res/shaders/lighting.frag" );
         this->lightingShader->use( ); // leifchri: does this need to be called every frame?
 
@@ -183,6 +183,35 @@ public:
         if ( renderMesh != nullptr ) {
             // Render to the screen 
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+            // Do we need to render 3 times? Could we render to stencil buffer and texture at same time?
+            // Render to the screen
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+            // Clear the screen
+            glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+            // Draw to stencil buffer
+            glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
+            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+            glStencilMask(0xFF); // Write to stencil buffer 
+            glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE); 
+            glDepthMask(GL_FALSE); // Don't write to depth buffer 
+
+            for ( int i=0; i<scene->children.size(); i++ ) {
+                // Draw the loaded model
+                glm::mat4 model = scene->children[i]->modelMatrix;
+                // std::cout << glm::to_string(model) << std::endl;
+                glUniformMatrix4fv( glGetUniformLocation( this->lightingShader->program, "model" ), 1, GL_FALSE, glm::value_ptr( model ) );
+                scene->children[i]->render( *this->lightingShader );
+            }
+
+            // Disable drawing to stencil buffer
+            glStencilMask(~0);
+            glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+            glDepthMask(GL_TRUE);
+            // Only draw fragment if stencil is 1
+            glStencilFunc(GL_EQUAL, 1, 0xFF);
 
             // glClearColor( 0.00f, 0.00f, 0.00f, 1.0f ); // make this a property
             glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -279,6 +308,7 @@ private:
         
         // OpenGL options
         glEnable( GL_DEPTH_TEST );
+        glEnable(GL_STENCIL_TEST);
 
         return 0;
     }

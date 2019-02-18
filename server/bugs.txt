@@ -24,3 +24,4 @@
 	- https://stackoverflow.com/questions/31237600/soil-load-image-returns-null
 * input def not scaled correctly, big (4096x4096) window results in super quick movement
 * transformations aren't exactly right
+* image caching issues, image loaded is one frame behind the render

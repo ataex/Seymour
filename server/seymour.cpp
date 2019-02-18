@@ -178,7 +178,7 @@ int main(int argc, char **argv) {
         srand(seed);
         int r = rand() % 400;
         renderer.noiseTextureId = TextureLoader::TextureFromFile( string("random" +to_string(r)+ ".jpg").c_str(), "res/noise" );
-        renderer.randomMatrix = makeRandomMat(seed);
+        // renderer.randomMatrix = makeRandomMat(seed);
 
         renderer.render( &scene, &camera, &renderMesh );
 
@@ -244,12 +244,12 @@ glm::mat4 makeRandomMat(unsigned int seed) {
     std::uniform_real_distribution<double> d(0.0,1.0);
 
     // int order[] = {0, 1, 2};
-    cerr << randomOrder.size() << endl;
+    // cerr << randomOrder.size() << endl;
     shuffle(randomOrder, 0, randomOrder.size()-1);
-    for (int i=0; i<randomOrder.size(); i++) {
-        std::cerr << randomOrder[i] << ",";
-    }
-    std::cerr << std::endl;
+    // for (int i=0; i<randomOrder.size(); i++) {
+    //     std::cerr << randomOrder[i] << ",";
+    // }
+    // std::cerr << std::endl;
 
     float max = distortionMax;
     glm::vec4 maxVector(1.0f, 1.0f, 1.0f, 1.0f);
