@@ -268,7 +268,7 @@ glm::mat4 makeRandomMat(unsigned int seed) {
         rz *= temp;
         // generate the distance for the transfomration
         dist = 2 * max * ( (float)rand() / (float)RAND_MAX ) - max;
-        max -= dist;
+        max -= abs(dist);
 
         glm::vec3 tempV;
         // will max vector always be the same?
