@@ -66,7 +66,7 @@ public:
 
     glm::mat4 randomMatrix;
 
-    int useLight[4] = {1, 1, 1, 0};
+    int useLight[4] = {1, 0, 0, 0};
     float lightPosition[4][3] = {
         {2.0f, 2.0f, 3.0f}, 
         {-2.0f, 2.0f, -3.0f}, 
@@ -135,7 +135,7 @@ public:
         // Point light 1
         glUniform1i( glGetUniformLocation( this->lightingShader->program, "useLightOne" ), useLight[0] );
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].position" ), lightPosition[0][0], lightPosition[0][1], lightPosition[0][2] );
-        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].ambient" ), 0.32f, 0.32f, 0.32f ); // 0.32f, 0.32f, 0.32f
+        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].ambient" ), 0.f, 0.f, 0.f ); // 0.32f, 0.32f, 0.32f
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].diffuse" ), 1.0f, 1.0f, 1.0f );
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].specular" ), 0.1f, 0.1f, 0.1f );
         glUniform1f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].constant" ), 1.0f );
