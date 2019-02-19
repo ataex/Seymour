@@ -51,8 +51,8 @@
 using namespace std;
 
 bool debugFlag = false;
-int screenWidth = 512;
-int screenHeight = 512;
+int screenWidth = 4096;
+int screenHeight = 4096;
 
 vector<int> randomOrder;
 float distortionMax = 0.01;
@@ -76,12 +76,12 @@ int main(int argc, char **argv) {
     FCGX_InitRequest(&request, 0, 0);
     
     Renderer renderer(screenWidth, screenHeight);
-    renderer.clearColor = glm::vec4( 0.0, 0.0, 0.0, 1.0 );
+    renderer.clearColor = glm::vec4( 0.0, 1.0, 0.0, 1.0 );
 
     Scene scene;
     Camera camera(glm::vec3( 0.0f, 0.0f, 0.0f ), 45.0f);
-    Model model0( "res/models/cube/cube.obj" );
-    // Model model0( "res/models/antoninus_pious/antoninus-pious-5m.obj" );
+    // Model model0( "res/models/cube/cube.obj" );
+    Model model0( "res/models/antoninus_pious/VC_0001_Antoninus_Pious-7m.obj" );
     // Model model0( "res/models/sphere/sphere.obj" );
     // scene.add( &model1 );
     scene.add( &model0 );
@@ -178,7 +178,7 @@ int main(int argc, char **argv) {
         srand(seed);
         int r = rand() % 400;
         renderer.noiseTextureId = TextureLoader::TextureFromFile( string("random" +to_string(r)+ ".jpg").c_str(), "res/noise" );
-        // renderer.randomMatrix = makeRandomMat(seed);
+        renderer.randomMatrix = makeRandomMat(seed);
 
         renderer.render( &scene, &camera, &renderMesh );
 
@@ -238,7 +238,7 @@ glm::mat4 makeRandomMat(unsigned int seed) {
     // return out;
 
     srand(seed);
-    // std::cerr << "Seed: " << seed << std::endl;
+    std::cerr << "Seed: " << seed << std::endl;
     
     std::default_random_engine gen;
     std::uniform_real_distribution<double> d(0.0,1.0);
@@ -246,10 +246,10 @@ glm::mat4 makeRandomMat(unsigned int seed) {
     // int order[] = {0, 1, 2};
     // cerr << randomOrder.size() << endl;
     shuffle(randomOrder, 0, randomOrder.size()-1);
-    // for (int i=0; i<randomOrder.size(); i++) {
-    //     std::cerr << randomOrder[i] << ",";
-    // }
-    // std::cerr << std::endl;
+    for (int i=0; i<randomOrder.size(); i++) {
+        std::cerr << randomOrder[i] << ",";
+    }
+    std::cerr << std::endl;
 
     float max = distortionMax;
     glm::vec4 maxVector(1.0f, 1.0f, 1.0f, 1.0f);
@@ -281,7 +281,8 @@ glm::mat4 makeRandomMat(unsigned int seed) {
                 ry *= dist;
                 rz *= dist;
                 // std::cerr << "rx:" << rx << " ry:" << ry << " rz" << rz << std::endl;
-                out = glm::translate(out, glm::vec3(rx, ry, rz));
+                tempMat = glm::translate(glm::mat4(1.0), glm::vec3(rx, ry, rz));
+                out = tempMat * out;
 
                 tempV = glm::vec3(maxVector.x, maxVector.y, maxVector.z);
                 maxVector.x += abs(rx);
@@ -300,7 +301,7 @@ glm::mat4 makeRandomMat(unsigned int seed) {
                 theta = acos(1 - (dist*dist) / (2*temp*temp));
                 // std::cerr << "theta: " << theta << std::endl;
                 tempMat = glm::rotate(glm::mat4(1.0), theta, glm::vec3(rx, ry, rz));
-                out = tempMat * out;
+                out = out * tempMat;
 
                 tempV = glm::vec3(maxVector.x, maxVector.y, maxVector.z);
                 maxVector = tempMat * maxVector;
@@ -314,7 +315,8 @@ glm::mat4 makeRandomMat(unsigned int seed) {
                 ry = 1.0 + (ry * dist) / maxVector.y;
                 rz = 1.0 + (rz * dist) / maxVector.z;
                 // std::cerr << "rx:" << rx << " ry:" << ry << " rz:" << rz << std::endl;
-                out = glm::scale(out, glm::vec3(rx, ry, rz));
+                tempMat = glm::scale(glm::mat4(1.0), glm::vec3(rx, ry, rz));
+                out = tempMat * out;
 
                 tempV = glm::vec3(maxVector.x, maxVector.y, maxVector.z);
                 maxVector.x *= rx;
