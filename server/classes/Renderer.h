@@ -95,7 +95,7 @@ public:
         this->randomMatrix = glm::mat4(1.0);
 
         this->clearColor = glm::vec4( 0.00f, 1.00f, 0.00f, 1.0f );
-        this->blendNoisePerc = 0.75;
+        this->blendNoisePerc = 1.00;
     }
 
     void render( Scene *scene, Camera *camera, Mesh *renderMesh = nullptr ) {
@@ -106,6 +106,8 @@ public:
             // Render to screen
             glBindFramebuffer(GL_FRAMEBUFFER, this->renderedFramebuffer);
         }
+
+        std::cerr << "Noise: " << this->blendNoisePerc << std::endl;
 
         glClearColor( this->clearColor.x, this->clearColor.y, this->clearColor.z, this->clearColor.w ); // make this a property
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
@@ -135,7 +137,7 @@ public:
         // Point light 1
         glUniform1i( glGetUniformLocation( this->lightingShader->program, "useLightOne" ), useLight[0] );
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].position" ), lightPosition[0][0], lightPosition[0][1], lightPosition[0][2] );
-        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].ambient" ), 0.f, 0.f, 0.f ); // 0.32f, 0.32f, 0.32f
+        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].ambient" ), 0.32f, 0.32f, 0.32f ); // 0.32f, 0.32f, 0.32f
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].diffuse" ), 1.0f, 1.0f, 1.0f );
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].specular" ), 0.1f, 0.1f, 0.1f );
         glUniform1f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].constant" ), 1.0f );

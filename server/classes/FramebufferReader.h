@@ -105,6 +105,7 @@ private:
 
 	// leifchri: is there a library to write pixels to jpeg? at the very least put this in seperate file
 	void writeJpeg(unsigned char* pixels, int windowWidth, int windowHeight, std::string filename) {
+		std::cerr << "JPEG: " << this->jpegQuality << std::endl;
 	    struct jpeg_compress_struct cinfo;
 	    struct jpeg_error_mgr jerr;
 	    FILE * outfile;        /* target file */

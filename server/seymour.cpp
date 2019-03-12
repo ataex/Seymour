@@ -51,8 +51,8 @@
 using namespace std;
 
 bool debugFlag = false;
-int screenWidth = 1024;
-int screenHeight = 1024;
+int screenWidth = 4096;
+int screenHeight = 4096;
 
 vector<int> randomOrder;
 float distortionMax = 0.01;
@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
     FCGX_InitRequest(&request, 0, 0);
     
     Renderer renderer(screenWidth, screenHeight);
-    renderer.clearColor = glm::vec4( 0.0, 0.0, 0.0, 1.0 );
+    renderer.clearColor = glm::vec4( 0.0, 1.0, 0.0, 1.0 );
 
     Scene scene;
     Camera camera(glm::vec3( 0.0f, 0.0f, 0.0f ), 45.0f);
@@ -90,7 +90,7 @@ int main(int argc, char **argv) {
 
     float m[] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
 
-    FramebufferReader framebufferReader("png", screenWidth, screenHeight);
+    FramebufferReader framebufferReader("jpg", screenWidth, screenHeight);
 
     // Game loop
     while (FCGX_Accept_r(&request) == 0) {
@@ -124,6 +124,9 @@ int main(int argc, char **argv) {
         std::vector<std::string> words;
         split(temp2.substr(i+1,temp2.length()), words, ',');
         //
+
+        cerr << route << endl;
+        cerr << "--RENDER--" << endl;
 
         if ( route.compare("render") == 0 ) {
             //
@@ -237,11 +240,15 @@ glm::mat4 makeRandomMat(unsigned int seed) {
     glm::mat4 out(1.0);
     // return out;
 
+    if (randomOrder.size() == 0) return out;
+
     srand(seed);
     std::cerr << "Seed: " << seed << std::endl;
     
     std::default_random_engine gen;
     std::uniform_real_distribution<double> d(0.0,1.0);
+
+    std::cerr << "max-dist: " << distortionMax << std::endl;
 
     // int order[] = {0, 1, 2};
     // cerr << randomOrder.size() << endl;
@@ -335,7 +342,7 @@ glm::mat4 makeRandomMat(unsigned int seed) {
     }
 
     // std::cerr << "Result: " << to_string(maxVector) << std::endl;
-    std::cerr << glm::distance(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(maxVector.x, maxVector.y, maxVector.z)) << std::endl;
+    std::cerr << "Final dist: " << glm::distance(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(maxVector.x, maxVector.y, maxVector.z)) << std::endl;
     float final = glm::distance(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(maxVector.x, maxVector.y, maxVector.z));
 
     // if (final > 0.01) {
