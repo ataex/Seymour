@@ -51,8 +51,8 @@
 using namespace std;
 
 bool debugFlag = false;
-int screenWidth = 4096;
-int screenHeight = 4096;
+int screenWidth = 512;
+int screenHeight = 512;
 
 vector<int> randomOrder;
 float distortionMax = 0.01;
@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
     FCGX_InitRequest(&request, 0, 0);
     
     Renderer renderer(screenWidth, screenHeight);
-    renderer.clearColor = glm::vec4( 0.0, 1.0, 0.0, 1.0 );
+    renderer.clearColor = glm::vec4( 1.0, 1.0, 1.0, 1.0 );
 
     Scene scene;
     Camera camera(glm::vec3( 0.0f, 0.0f, 0.0f ), 45.0f);
@@ -177,9 +177,15 @@ int main(int argc, char **argv) {
 
         // better way to deal with this? do we want to do model by model? or entire scene?
         model0.modelMatrix = glm::make_mat4(m);
-        unsigned int seed = getUIntHash(to_string(model0.modelMatrix).c_str());
+        cerr << to_string(model0.modelMatrix).c_str() << endl;
+        string seedstr = to_string(model0.modelMatrix);
+        cerr << "Seedstr: " << seedstr << endl;
+        unsigned int seed = getUIntHash(seedstr.c_str());
+        cerr << getUIntHash("foobar") << endl;
         srand(seed);
+        cerr << "Seed: " << seed << endl;
         int r = rand() % 400;
+        cerr << "Noise Texture: " << r << endl;
         renderer.noiseTextureId = TextureLoader::TextureFromFile( string("random" +to_string(r)+ ".jpg").c_str(), "res/noise" );
         renderer.randomMatrix = makeRandomMat(seed);
 

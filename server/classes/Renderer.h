@@ -37,6 +37,11 @@
 // Other Libs
 #include "SOIL/SOIL.h"
 
+void error_callback(int error, const char* description)
+{
+    fprintf(stderr, "Error: %s\n", description);
+}
+
 class Renderer {
 public:
     /* Renderer Data */
@@ -137,7 +142,7 @@ public:
         // Point light 1
         glUniform1i( glGetUniformLocation( this->lightingShader->program, "useLightOne" ), useLight[0] );
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].position" ), lightPosition[0][0], lightPosition[0][1], lightPosition[0][2] );
-        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].ambient" ), 0.32f, 0.32f, 0.32f ); // 0.32f, 0.32f, 0.32f
+        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].ambient" ), 0.5f, 0.5f, 0.5f ); // 0.32f, 0.32f, 0.32f
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].diffuse" ), 1.0f, 1.0f, 1.0f );
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].specular" ), 0.1f, 0.1f, 0.1f );
         glUniform1f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].constant" ), 1.0f );
@@ -275,8 +280,10 @@ private:
         glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
         glfwWindowHint( GLFW_RESIZABLE, GL_FALSE );
         
+        glfwSetErrorCallback(error_callback);
+
         // Create a GLFWwindow object that we can use for GLFW's functions
-         this->window = glfwCreateWindow( this->width, this->height, this->name, nullptr, nullptr );
+        this->window = glfwCreateWindow( this->width, this->height, this->name, nullptr, nullptr );
         
         if ( nullptr == window )
         {

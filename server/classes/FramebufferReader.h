@@ -1,8 +1,19 @@
+// http://www.andrewewhite.net/wordpress/2010/04/07/simple-cc-jpeg-writer-part-2-write-to-buffer-in-memory/
 #include <ctime>
 #include <string>
 #include <sstream>
 #include <jpeglib.h>
 #include "lodepng.h"
+
+/* setup the buffer but we did that in the main function */
+void init_buffer(jpeg_compress_struct* cinfo) {}
+ 
+/* what to do when the buffer is full; this should almost never
+ * happen since we allocated our buffer to be big to start with
+ */
+boolean empty_buffer(jpeg_compress_struct* cinfo) {
+	return TRUE;
+}
 
 class FramebufferReader {
 public:
