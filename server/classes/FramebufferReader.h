@@ -5,6 +5,8 @@
 #include <jpeglib.h>
 #include "lodepng.h"
 
+#include "Timer.h"
+
 /* setup the buffer but we did that in the main function */
 void init_buffer(jpeg_compress_struct* cinfo) {}
  
@@ -14,6 +16,9 @@ void init_buffer(jpeg_compress_struct* cinfo) {}
 boolean empty_buffer(jpeg_compress_struct* cinfo) {
 	return TRUE;
 }
+
+/* finalize the buffer and do any cleanup stuff */
+void term_buffer(jpeg_compress_struct* cinfo) {}
 
 class FramebufferReader {
 public:
@@ -33,6 +38,8 @@ public:
     }
 
     void writeFrameToCout() {
+        Timer::getInstance()->addTime("Start FramebufferReader");
+        // auto start = high_resolution_clock::now(); 
     	// Read the pixels from the frame buffer
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
@@ -42,10 +49,14 @@ public:
         	glReadPixels(0, 0, this->screen_width, this->screen_height, GL_RGB, GL_UNSIGNED_BYTE, this->pixels);
         }
 
+        Timer::getInstance()->addTime("Read pixels");
+
         // leifchri: is there not a faster way to do this? Why doesn't the frame buffer draw flipped?
         // flip the image along the x-axis
         flipImage(this->pixels, this->screen_width, this->screen_height, this->imageSizeInBytes);
-        
+
+        Timer::getInstance()->addTime("Flip Pixels");
+
         std::time_t t = std::time(0); 
         std::stringstream ss;
         ss << t;
@@ -58,6 +69,9 @@ public:
 	    	str = "./frames/frame" + ss.str() + ".jpeg";
 	        writeJpeg(this->pixels, this->screen_width, this->screen_height, str);
 		}
+
+        Timer::getInstance()->addTime("Image Write");
+
 
         // vars for file reading
         FILE * pFile;
@@ -88,6 +102,7 @@ public:
         fclose (pFile);
 
         free(buffer);
+        Timer::getInstance()->addTime("Write Image to COUT");
     }
 
     ~FramebufferReader() {
@@ -114,10 +129,8 @@ private:
 	    }
 	}
 
-	// leifchri: is there a library to write pixels to jpeg? at the very least put this in seperate file
 	void writeJpeg(unsigned char* pixels, int windowWidth, int windowHeight, std::string filename) {
-		std::cerr << "JPEG: " << this->jpegQuality << std::endl;
-	    struct jpeg_compress_struct cinfo;
+		struct jpeg_compress_struct cinfo;
 	    struct jpeg_error_mgr jerr;
 	    FILE * outfile;        /* target file */
 	    JSAMPROW row_pointer[1];    /* pointer to JSAMPLE row[s] */
@@ -159,6 +172,60 @@ private:
 	    fclose(outfile);
 	    /* Step 7: release JPEG compression object */
 	    jpeg_destroy_compress(&cinfo);
+	}
+
+	// leifchri: is there a library to write pixels to jpeg? at the very least put this in seperate file
+	void writeJpeg2(unsigned char* pixels, int windowWidth, int windowHeight, std::string filename) {
+		struct jpeg_compress_struct cinfo;
+		struct jpeg_error_mgr       jerr;
+		struct jpeg_destination_mgr dmgr;
+	 
+		/* create our in-memory output buffer to hold the jpeg */
+		unsigned char * out_buffer   = new unsigned char[windowWidth * windowHeight * 3];
+	 
+		/* here is the magic */
+		dmgr.init_destination    = init_buffer;
+		dmgr.empty_output_buffer = empty_buffer;
+		dmgr.term_destination    = term_buffer;
+		dmgr.next_output_byte    = out_buffer;
+		dmgr.free_in_buffer      = windowWidth * windowHeight * 3;
+	 
+		cinfo.err = jpeg_std_error(&jerr);
+		jpeg_create_compress(&cinfo);
+	 
+		/* make sure we tell it about our manager */
+		cinfo.dest = &dmgr;
+	 
+		cinfo.image_width      = windowWidth;
+		cinfo.image_height     = windowHeight;
+		cinfo.input_components = 3;
+		cinfo.in_color_space   = JCS_RGB;
+	 
+		jpeg_set_defaults(&cinfo);
+		jpeg_set_quality (&cinfo, this->jpegQuality, true);
+		jpeg_start_compress(&cinfo, true);
+	 
+		JSAMPROW row_pointer;
+		// Uint8 *buffer    = (Uint8*) pixels;
+	 	int row_stride = windowWidth * 3;
+
+		/* main code to write jpeg data */
+		while (cinfo.next_scanline < cinfo.image_height) { 		
+			row_pointer = (JSAMPROW) &pixels[cinfo.next_scanline * row_stride];
+			jpeg_write_scanlines(&cinfo, &row_pointer, 1);
+		}
+		jpeg_finish_compress(&cinfo);
+
+		// fwrite(out_buffer, cinfo.dest->next_output_byte - out_buffer, 1, stdout);
+		//std::cout << out_buffer;
+		// std::cout << "Rendering";
+		// std::cout.write(&out_buffer[0], windowWidth * windowHeight * 3);
+		int len = windowWidth * windowHeight * 3;
+		// for(int i = 0; i < len; i++) {
+		//   std::cout << (unsigned char)out_buffer[i]; 
+		// }
+		FILE *outfile = fopen(filename.c_str(), "wb");
+		fwrite(out_buffer, sizeof(unsigned char), windowWidth * windowHeight * 3, outfile);
 	}
 
 	void writePng(unsigned char* pixels, int width, int height, std::string filename) {

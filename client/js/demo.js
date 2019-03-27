@@ -27,6 +27,8 @@ var host = "localhost";
 var phi = -60;
 var theta = 0;
 
+var doPrintFrames = true;
+
 window.onload = init;
 // animate();
 
@@ -35,6 +37,7 @@ function init() {
 	document.getElementById("server-texture").checked = serverTexture;	
 	document.getElementById("client-texture").checked = clientTexture;	
 	document.getElementById("server-texture").onchange = function () { 
+		console.log("clicked me")
 		serverTexture = document.getElementById("server-texture").checked; 
 		render();
 		requestRender();
@@ -42,7 +45,7 @@ function init() {
 	document.getElementById("client-texture").onchange = function () { 
 		clientTexture = document.getElementById("client-texture").checked; 
 		var head = scene.getObjectByName( "head" );
-		if ( !clientTexture ) head.children[0].material = new THREE.MeshLambertMaterial( {color: 0xaaaaaa});
+		if ( !clientTexture ) head.children[0].material = new THREE.MeshPhongMaterial( {color: 0xaaaaaa, flatShading: true}); 
 		else head.children[0].material = clientMaterial;
 		head.children[0].material.needsUpdate = true;
 		render();
@@ -57,6 +60,8 @@ function init() {
 	img.src = "http://"+host+"/renderer/render/1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,45,1,0,0,5";
 	img.style = "position: absolute;";
 	container.appendChild(img)
+
+	hideOverlay();
 
 	img.onmousedown = function(ev) {
 		ev.preventDefault();
@@ -76,11 +81,11 @@ function init() {
 
 	scene = new THREE.Scene();
 
-	var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+	var ambientLight = new THREE.AmbientLight( 0x404040 );
 	scene.add( ambientLight );
 
 	pointLight0 = new THREE.PointLight( 0xffffff, 0.8 );
-	pointLight0.position.set( 2.0, 2.0, 3.0 );
+	pointLight0.position.set( -1.0, 0.5, 3.0 );
 	scene.add( pointLight0 );
 
 	pointLight1 = new THREE.PointLight( 0xffff00, 0.8 );
@@ -109,15 +114,19 @@ function init() {
 	THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
 
 	new THREE.MTLLoader()
-		.setPath( 'models/obj/zeus_ammon/' )
-		.load( 'zeus-ammon-25k.mtl', function ( materials ) {
+		.setPath( 'models/obj/antoninus_pious/' )
+		.load( 'VC_0001_Antoninus_Pious-15k.obj.mtl', function ( materials ) {
+		// .setPath( 'models/obj/cube/' )
+		// .load( 'cube.mtl', function ( materials ) {
 
 			materials.preload();
 
 			new THREE.OBJLoader()
 				.setMaterials( materials )
-				.setPath( 'models/obj/zeus_ammon/' )
-				.load( 'zeus-ammon-25k.obj', function ( object ) {
+				.setPath( 'models/obj/antoninus_pious/' )
+				.load( 'VC_0001_Antoninus_Pious-15k.obj', function ( object ) {
+				// .setPath( 'models/obj/cube/' )
+				// .load( 'cube.obj', function ( object ) {
 
 					object.position.z = 0;
 					object.name = "head";
@@ -127,7 +136,10 @@ function init() {
 
 					var temp = new THREE.Matrix4();
 
+					requestRender();
+					changeDistortion();
 					render();
+					requestRender();
 				}, onProgress, onError );
 
 		} );
@@ -168,7 +180,40 @@ function init() {
 
 	// window.addEventListener( 'resize', onWindowResize, false );
 
+	initDistortionControls();
+
 	render();
+}
+
+function initDistortionControls() {
+	document.getElementById("jpeg-num").innerHTML = document.getElementById("jpeg-slider").value;
+	document.getElementById("jpeg-slider").onchange = function () {
+		document.getElementById("jpeg-num").innerHTML = this.value;
+		changeDistortion();
+	}
+	document.getElementById("noise-num").innerHTML = (document.getElementById("noise-slider").value/10) + "%";
+	document.getElementById("noise-slider").onchange = function () {
+		document.getElementById("noise-num").innerHTML = (this.value/10) + "%";
+		changeDistortion();
+	}
+	document.getElementById("trans-checkbox").onchange = function () {
+		changeDistortion();
+	}
+	document.getElementById("scale-checkbox").onchange = function () {
+		changeDistortion();
+	}
+	document.getElementById("rotate-checkbox").onchange = function () {
+		changeDistortion();
+	}
+	document.getElementById("geo-dist-num").innerHTML = (document.getElementById("geo-dist-slider").value/1000);
+	document.getElementById("geo-dist-slider").onchange = function () {
+		document.getElementById("geo-dist-num").innerHTML = (this.value/1000);
+		changeDistortion();
+	}
+}
+
+function changeDistortion() {
+	img.src = "http://" + host + "/renderer/distortions/" + document.getElementById("jpeg-slider").value + "," + (document.getElementById("noise-slider").value/1000) + "," + (document.getElementById("trans-checkbox").checked?1:0) + "," + (document.getElementById("rotate-checkbox").checked?1:0) + "," + (document.getElementById("scale-checkbox").checked?1:0) + "," + (document.getElementById("geo-dist-slider").value/1000) ;
 }
 
 var interval;
@@ -177,8 +222,8 @@ function gatherFrames(mode) {
 		case 0:
 			var temp = new THREE.Matrix4();
 			camera.applyMatrix( temp.makeRotationAxis( new THREE.Vector3(1, 0, 0), THREE.Math.degToRad(-100) ) );
-			zoom( - 50 );
-			interval = setInterval(rotateModel, 500);
+			zoom( - 40 );
+			interval = setInterval(rotateModel, 1500);
 			break;
 		default:
 			break;
@@ -191,12 +236,14 @@ function stopGatherFrames() {
 
 // should produce 511 frames...
 var camY = -2;
-var theta = 5;
+var theta = 10;
 var thetaSum = 0;
 var phi = 20;
 var phiSum = -100;
+var p = 0;
 function rotateModel() {
-	if (phiSum == 120) clearInterval(interval);
+	if (p==(36*9) || phiSum == 120) clearInterval(interval);
+	console.log(p, phiSum, thetaSum);
 	var temp = new THREE.Matrix4();
 	if ((thetaSum%360) == 0) {
 		camera.applyMatrix( temp.makeRotationAxis( new THREE.Vector3(1, 0, 0), THREE.Math.degToRad(phi) ) );
@@ -207,6 +254,8 @@ function rotateModel() {
 	camera.lookAt( new THREE.Vector3(0, 0, 0) );
 	thetaSum += theta;
 
+	p++;
+
 	render();
 
 	requestRender();
@@ -214,6 +263,7 @@ function rotateModel() {
 
 function hideOverlay() {
 	img.style.visibility = "hidden";
+	img.src = "";
 	img.style.width = "0pt";
 	img.style.height = "0pt";
 }
@@ -323,7 +373,8 @@ function requestRender() {
 		} else {
 			path = "http://"+host+"/renderer/render/" + matStr + "," + camera.fov + "," + (serverTexture?1:0) + "," + camera.position.x + "," + camera.position.y + "," + camera.position.z;
 		}
-		document.getElementById('frames-print').innerHTML += ',"' + path + '"';
+		if (doPrintFrames)
+			document.getElementById('frames-print').innerHTML += ',"' + path + '"';
 		img.src = path;
 	}
 }

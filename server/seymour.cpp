@@ -48,6 +48,8 @@
 #include <random>
 #include <openssl/md5.h>
 
+#include "Timer.h"
+
 using namespace std;
 
 bool debugFlag = false;
@@ -63,6 +65,9 @@ void swap(int* arr, int i, int j);
 void shuffle(int* arr, int start, int end);
 unsigned int getUIntHash(const char* s);
 glm::mat4 makeRandomMat(unsigned int seed);
+
+//Initialize pointer to zero so that it can be initialized in first call to getInstance
+Timer *Timer::instance = 0;
 
 int main(int argc, char **argv) {
     // Backup the stdio streambufs
@@ -82,6 +87,7 @@ int main(int argc, char **argv) {
     Camera camera(glm::vec3( 0.0f, 0.0f, 0.0f ), 45.0f);
     // Model model0( "res/models/cube/cube.obj" );
     Model model0( "res/models/antoninus_pious/VC_0001_Antoninus_Pious-7m.obj" );
+    std::cerr << "Model loaded" << std::endl;
     // Model model0( "res/models/sphere/sphere.obj" );
     // scene.add( &model1 );
     scene.add( &model0 );
@@ -103,7 +109,9 @@ int main(int argc, char **argv) {
         // cerr.rdbuf(&cerr_fcgi_streambuf);    
 
         if (debugFlag) {
+            std::cerr << "Debug Mode" << std::endl;
             std::cout << "Content-type: text/html\r\n\r\n";
+            std::cout << "<h1>Debug Content</h1><br>";
         }
 
         char * uri = FCGX_GetParam("REQUEST_URI", request.envp);
@@ -127,6 +135,9 @@ int main(int argc, char **argv) {
 
         cerr << route << endl;
         cerr << "--RENDER--" << endl;
+
+        Timer::getInstance()->clearTimes();
+        Timer::getInstance()->addTime("Start");
 
         if ( route.compare("render") == 0 ) {
             //
@@ -177,26 +188,33 @@ int main(int argc, char **argv) {
 
         // better way to deal with this? do we want to do model by model? or entire scene?
         model0.modelMatrix = glm::make_mat4(m);
-        cerr << to_string(model0.modelMatrix).c_str() << endl;
+        // cerr << to_string(model0.modelMatrix).c_str() << endl;
         string seedstr = to_string(model0.modelMatrix);
-        cerr << "Seedstr: " << seedstr << endl;
+        // cerr << "Seedstr: " << seedstr << endl;
         unsigned int seed = getUIntHash(seedstr.c_str());
-        cerr << getUIntHash("foobar") << endl;
+        // cerr << getUIntHash("foobar") << endl;
         srand(seed);
-        cerr << "Seed: " << seed << endl;
+        // cerr << "Seed: " << seed << endl;
         int r = rand() % 400;
-        cerr << "Noise Texture: " << r << endl;
-        renderer.noiseTextureId = TextureLoader::TextureFromFile( string("random" +to_string(r)+ ".jpg").c_str(), "res/noise" );
+        // cerr << "Noise Texture: " << r << endl;
+        //renderer.noiseTextureId = TextureLoader::TextureFromFile( string("random" +to_string(r)+ ".jpg").c_str(), "res/noise" );
+        Timer::getInstance()->addTime("Random Texture");
+
         renderer.randomMatrix = makeRandomMat(seed);
+        Timer::getInstance()->addTime("Random Matrix");
 
         renderer.render( &scene, &camera, &renderMesh );
+        Timer::getInstance()->addTime("Render");
+
 
         if (!debugFlag) {
             std::cout << "Content-type: image/png\r\n\r\n";
             framebufferReader.writeFrameToCout();
         }
-
         std::cout << std::endl;
+        Timer::getInstance()->addTime("Sent Frame");
+
+        Timer::getInstance()->printTimes();
     }
     
     renderer.close();
@@ -249,12 +267,12 @@ glm::mat4 makeRandomMat(unsigned int seed) {
     if (randomOrder.size() == 0) return out;
 
     srand(seed);
-    std::cerr << "Seed: " << seed << std::endl;
+    // std::cerr << "Seed: " << seed << std::endl;
     
     std::default_random_engine gen;
     std::uniform_real_distribution<double> d(0.0,1.0);
 
-    std::cerr << "max-dist: " << distortionMax << std::endl;
+    // std::cerr << "max-dist: " << distortionMax << std::endl;
 
     // int order[] = {0, 1, 2};
     // cerr << randomOrder.size() << endl;
@@ -262,7 +280,7 @@ glm::mat4 makeRandomMat(unsigned int seed) {
     for (int i=0; i<randomOrder.size(); i++) {
         std::cerr << randomOrder[i] << ",";
     }
-    std::cerr << std::endl;
+    // std::cerr << std::endl;
 
     float max = distortionMax;
     glm::vec4 maxVector(1.0f, 1.0f, 1.0f, 1.0f);
@@ -348,7 +366,7 @@ glm::mat4 makeRandomMat(unsigned int seed) {
     }
 
     // std::cerr << "Result: " << to_string(maxVector) << std::endl;
-    std::cerr << "Final dist: " << glm::distance(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(maxVector.x, maxVector.y, maxVector.z)) << std::endl;
+    // std::cerr << "Final dist: " << glm::distance(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(maxVector.x, maxVector.y, maxVector.z)) << std::endl;
     float final = glm::distance(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(maxVector.x, maxVector.y, maxVector.z));
 
     // if (final > 0.01) {

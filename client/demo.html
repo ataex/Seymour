@@ -22,15 +22,109 @@
 				display:block;
 			}
 			#info a, .button { color: #f00; font-weight: bold; text-decoration: underline; cursor: pointer }
+			.slider {
+				vertical-align: middle;
+			}
+			td, tr {
+				vertical-align: middle;
+			}
 		</style>
 	</head>
 
 	<body oncontextmenu="return false;">
 		<div id="webgl-container"></div>
-		<input type="checkbox" id="client-texture"><span>Client Texture</span><br>
-		<input type="checkbox" id="server-texture"><span>Server Texture</span><br>
-		<button type="button" onclick="gatherFrames(0);">Start Gather</button>
-		<button type="button" onclick="stopGatherFrames();">Stop Gather</button><br>
+
+		<table class="controls">
+<tr>
+				<td>
+					<table>
+						<tr>
+							<td>
+								<h3>Visualization</h3>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<input type="checkbox" id="client-texture"><span>Client Texture</span>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<input type="checkbox" id="server-texture"><span>Server Texture</span>
+							</td>
+						</tr>
+					</table>
+				</td>
+				<td>
+					<table>
+						<tr>
+							<td colspan="3">
+								<h3>Image Distortions</h3>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span>JPEG Quality: </span>
+							</td>
+							<td>
+								<input type="range" min="1" max="90" value="40" class="slider" id="jpeg-slider">
+							</td>
+							<td>
+								<span id="jpeg-num">40</span>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span>Hi-freq Noise %: </span>
+							</td>
+							<td>
+								<input type="range" min="500" max="1000" value="980" class="slider" id="noise-slider">
+							</td>
+							<td>
+								<span id="noise-num">98%</span>
+							</td>
+						</tr>
+					</table>
+				</td>
+				<td>
+					<table>
+						<tr>
+							<td colspan="3">
+								<h3>Geometric Distortions</h3>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<input type="checkbox" id="trans-checkbox"><span>Translate</span>
+							</td>
+							<td>
+								<input type="checkbox" id="scale-checkbox"><span>Scale</span>
+							</td>
+							<td>
+								<input type="checkbox" id="rotate-checkbox"><span>Rotate</span>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span>Max distance: </span>
+							</td>
+							<td colspan="2">
+								<input type="range" min="0" max="50" value="1" class="slider" id="geo-dist-slider">
+							</td>
+							<td>
+								<span id="geo-dist-num">0.01</span>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<button type="button" onclick="gatherFrames(0);">Start Gather</button>
+					<button type="button" onclick="stopGatherFrames();">Stop Gather</button><br>
+				</td>
+			</tr>
+		</table>
 
 		<div id="frames-print"></div>
 

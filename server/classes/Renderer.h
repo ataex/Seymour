@@ -112,7 +112,7 @@ public:
             glBindFramebuffer(GL_FRAMEBUFFER, this->renderedFramebuffer);
         }
 
-        std::cerr << "Noise: " << this->blendNoisePerc << std::endl;
+        // std::cerr << "Noise: " << this->blendNoisePerc << std::endl;
 
         glClearColor( this->clearColor.x, this->clearColor.y, this->clearColor.z, this->clearColor.w ); // make this a property
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
