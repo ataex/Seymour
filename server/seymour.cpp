@@ -53,8 +53,8 @@
 using namespace std;
 
 bool debugFlag = false;
-int screenWidth = 512;
-int screenHeight = 512;
+int screenWidth = 1024;
+int screenHeight = 1024;
 
 vector<int> randomOrder;
 float distortionMax = 0.01;
@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
     FCGX_InitRequest(&request, 0, 0);
     
     Renderer renderer(screenWidth, screenHeight);
-    renderer.clearColor = glm::vec4( 1.0, 1.0, 1.0, 1.0 );
+    renderer.clearColor = glm::vec4( 0.0, 0.0, 0.0, 1.0 );
 
     Scene scene;
     Camera camera(glm::vec3( 0.0f, 0.0f, 0.0f ), 45.0f);
@@ -197,7 +197,7 @@ int main(int argc, char **argv) {
         // cerr << "Seed: " << seed << endl;
         int r = rand() % 400;
         // cerr << "Noise Texture: " << r << endl;
-        //renderer.noiseTextureId = TextureLoader::TextureFromFile( string("random" +to_string(r)+ ".jpg").c_str(), "res/noise" );
+        renderer.noiseTextureId = TextureLoader::TextureFromFile( string("random" +to_string(r)+ ".jpg").c_str(), "res/noise" );
         Timer::getInstance()->addTime("Random Texture");
 
         renderer.randomMatrix = makeRandomMat(seed);

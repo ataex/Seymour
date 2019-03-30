@@ -128,7 +128,7 @@ public:
         glUniformMatrix4fv( glGetUniformLocation( this->lightingShader->program, "view" ), 1, GL_FALSE, glm::value_ptr( view ) );
 
         glUniform1i( glGetUniformLocation( this->lightingShader->program, "useTexture" ), this->useTexture );
-        glUniform3f( glGetUniformLocation( this->lightingShader->program, "fragColor" ), 0.66f, 0.66f, 0.66f );
+        glUniform3f( glGetUniformLocation( this->lightingShader->program, "fragColor" ), 0.4f, 0.4f, 0.4f );
 
         // Set material properties
         glUniform1f( glGetUniformLocation( this->lightingShader->program, "material.shininess" ), 32.0f );
@@ -144,7 +144,7 @@ public:
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].position" ), lightPosition[0][0], lightPosition[0][1], lightPosition[0][2] );
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].ambient" ), 0.5f, 0.5f, 0.5f ); // 0.32f, 0.32f, 0.32f
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].diffuse" ), 1.0f, 1.0f, 1.0f );
-        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].specular" ), 0.1f, 0.1f, 0.1f );
+        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].specular" ), 0.5f, 0.5f, 0.5f );
         glUniform1f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].constant" ), 1.0f );
         glUniform1f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].linear" ), 0.09f );
         glUniform1f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].quadratic" ), 0.032f );
