@@ -111,7 +111,7 @@ public:
             // Render to screen
             glBindFramebuffer(GL_FRAMEBUFFER, this->renderedFramebuffer);
         }
-
+https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.size.html
         // std::cerr << "Noise: " << this->blendNoisePerc << std::endl;
 
         glClearColor( this->clearColor.x, this->clearColor.y, this->clearColor.z, this->clearColor.w ); // make this a property
@@ -131,7 +131,7 @@ public:
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "fragColor" ), 0.4f, 0.4f, 0.4f );
 
         // Set material properties
-        glUniform1f( glGetUniformLocation( this->lightingShader->program, "material.shininess" ), 32.0f );
+        glUniform1f( glGetUniformLocation( this->lightingShader->program, "material.shininess" ), 1.0f );
         // == ==========================
         // Here we set all the uniforms for the 5/6 types of lights we have. We have to set them manually and index
         // the proper PointLight struct in the array to set each uniform variable. This can be done more code-friendly
@@ -142,7 +142,7 @@ public:
         // Point light 1
         glUniform1i( glGetUniformLocation( this->lightingShader->program, "useLightOne" ), useLight[0] );
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].position" ), lightPosition[0][0], lightPosition[0][1], lightPosition[0][2] );
-        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].ambient" ), 0.5f, 0.5f, 0.5f ); // 0.32f, 0.32f, 0.32f
+        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].ambient" ), 0.0f, 0.0f, 0.0f ); // 0.32f, 0.32f, 0.32f
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].diffuse" ), 1.0f, 1.0f, 1.0f );
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].specular" ), 0.5f, 0.5f, 0.5f );
         glUniform1f( glGetUniformLocation( this->lightingShader->program, "pointLights[0].constant" ), 1.0f );
@@ -172,9 +172,9 @@ public:
         // Point light 4
         glUniform1i( glGetUniformLocation( this->lightingShader->program, "useLightFour" ), useLight[3] );
         glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[3].position" ), lightPosition[3][0], lightPosition[3][1], lightPosition[3][2] );
-        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[3].ambient" ), 0.32f, 0.32f, 0.32f );
-        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[3].diffuse" ), 0.0f, 1.0f, 1.0f );
-        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[3].specular" ), 0.1f, 0.1f, 0.1f );
+        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[3].ambient" ), 0.0f, 0.0f, 0.0f ); // 0.32f, 0.32f, 0.32f
+        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[3].diffuse" ), 0.4f, 0.4f, 0.4f );
+        glUniform3f( glGetUniformLocation( this->lightingShader->program, "pointLights[3].specular" ), 0.5f, 0.5f, 0.5f );
         glUniform1f( glGetUniformLocation( this->lightingShader->program, "pointLights[3].constant" ), 1.0f );
         glUniform1f( glGetUniformLocation( this->lightingShader->program, "pointLights[3].linear" ), 0.09f );
         glUniform1f( glGetUniformLocation( this->lightingShader->program, "pointLights[3].quadratic" ), 0.032f );

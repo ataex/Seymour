@@ -86,9 +86,9 @@ int main(int argc, char **argv) {
     Scene scene;
     Camera camera(glm::vec3( 0.0f, 0.0f, 0.0f ), 45.0f);
     // Model model0( "res/models/cube/cube.obj" );
-    Model model0( "res/models/antoninus_pious/VC_0001_Antoninus_Pious-7m.obj" );
+    // Model model0( "res/models/antoninus_pious/VC_0001_Antoninus_Pious-7m.obj" );
     std::cerr << "Model loaded" << std::endl;
-    // Model model0( "res/models/sphere/sphere.obj" );
+    Model model0( "res/models/sphere/sphere.obj" );
     // scene.add( &model1 );
     scene.add( &model0 );
 
@@ -96,7 +96,7 @@ int main(int argc, char **argv) {
 
     float m[] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
 
-    FramebufferReader framebufferReader("jpg", screenWidth, screenHeight);
+    FramebufferReader framebufferReader("png", screenWidth, screenHeight);
 
     // Game loop
     while (FCGX_Accept_r(&request) == 0) {
@@ -191,8 +191,9 @@ int main(int argc, char **argv) {
         // cerr << to_string(model0.modelMatrix).c_str() << endl;
         string seedstr = to_string(model0.modelMatrix);
         // cerr << "Seedstr: " << seedstr << endl;
-        unsigned int seed = getUIntHash(seedstr.c_str());
-        // cerr << getUIntHash("foobar") << endl;
+        char cstr0[seedstr.size() + 1];
+        strcpy(cstr0, seedstr.c_str());
+        unsigned int seed = getUIntHash(cstr0);
         srand(seed);
         // cerr << "Seed: " << seed << endl;
         int r = rand() % 400;
@@ -203,12 +204,45 @@ int main(int argc, char **argv) {
         renderer.randomMatrix = makeRandomMat(seed);
         Timer::getInstance()->addTime("Random Matrix");
 
+        // Random lights
+        seedstr = to_string(renderer.lightPosition[0][0]) + "," + to_string(renderer.lightPosition[0][1]) + "," + to_string(renderer.lightPosition[0][2]);
+        char cstr1[seedstr.size() + 1];
+        strcpy(cstr1, seedstr.c_str());
+        cerr << cstr1 << endl;
+        seed = getUIntHash(cstr1);
+        cerr << seed << endl;
+        srand(seed);
+
+        float lightMax = 2.0;
+        float dist = lightMax * (2 * ( (float)rand() / (float)RAND_MAX ) - 1.0);
+        float x = rand();
+        float y = rand();
+        float z = rand();
+        float norm = sqrt(x*x + y*y + z*z);
+        // renderer.lightPosition[3][0] = dist * x/norm;
+        // renderer.lightPosition[3][1] = dist * y/norm;
+        // renderer.lightPosition[3][2] = dist * z/norm;
+
+        cerr << renderer.lightPosition[3][0] << " " << renderer.lightPosition[3][1] << " " << renderer.lightPosition[3][2] << endl;
+
+        lightMax = 0.2;
+        dist = lightMax * (2 * ( (float)rand() / (float)RAND_MAX ) - 1.0);
+        x = rand();
+        y = rand();
+        z = rand();
+        norm = sqrt(x*x + y*y + z*z);
+        // renderer.lightPosition[0][0] += dist * x/norm;
+        // renderer.lightPosition[0][1] += dist * y/norm;
+        // renderer.lightPosition[0][2] += dist * z/norm;
+
+        cerr << renderer.lightPosition[0][0] << " " << renderer.lightPosition[0][1] << " " << renderer.lightPosition[0][2] << endl;
+
         renderer.render( &scene, &camera, &renderMesh );
         Timer::getInstance()->addTime("Render");
 
 
         if (!debugFlag) {
-            std::cout << "Content-type: image/png\r\n\r\n";
+            std::cout << "Content-type: image/jpeg\r\n\r\n";
             framebufferReader.writeFrameToCout();
         }
         std::cout << std::endl;
@@ -238,6 +272,7 @@ void split(const std::string& str, std::vector<std::string>& cont, char delim = 
 }
 
 unsigned int getUIntHash(const char* s) {
+    cerr << s << endl;
     unsigned char digest[MD5_DIGEST_LENGTH];
     MD5((unsigned char*)&s, strlen(s), (unsigned char*)&digest);    
     char mdString[33]; 

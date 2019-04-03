@@ -109,14 +109,14 @@ void main( )
     //result += CalcSpotLight( spotLight, norm, FragPos, viewDir );
     
     // Normal Map
-    // color = vec4( norm, 1.0 );
+    // color = vec4( (norm.x+1)/2, (norm.y+1)/2, (norm.z+1)/2, 1.0 );
     // Geometry Mask
     // color = vec4( 1.0, 1.0, 1.0, 1.0 );
 
     // Lit rendering
     color = vec4( result, 1.0 );
     // Unlit redering
-    color = texture( material.diffuse, TexCoords );
+    // color = texture( material.diffuse, TexCoords );
 }
 
 // Calculates the color when using a directional light.
