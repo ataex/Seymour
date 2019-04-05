@@ -53,8 +53,8 @@
 using namespace std;
 
 bool debugFlag = false;
-int screenWidth = 1024;
-int screenHeight = 1024;
+int screenWidth = 512;
+int screenHeight = 512;
 
 vector<int> randomOrder;
 float distortionMax = 0.01;
@@ -87,16 +87,19 @@ int main(int argc, char **argv) {
     Camera camera(glm::vec3( 0.0f, 0.0f, 0.0f ), 45.0f);
     // Model model0( "res/models/cube/cube.obj" );
     // Model model0( "res/models/antoninus_pious/VC_0001_Antoninus_Pious-7m.obj" );
+    Model model0( "res/models/saint-nicodeme-plumeliau/saint-nicodeme-plumeliau.obj" );
     std::cerr << "Model loaded" << std::endl;
-    Model model0( "res/models/sphere/sphere.obj" );
+    // Model model0( "res/models/sphere/sphere.obj" );
     // scene.add( &model1 );
     scene.add( &model0 );
 
     Mesh renderMesh = MeshFactory::quadMesh(1.0f, 4, 1.0f, 4);
 
     float m[] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    float viewMat[] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    float projMat[] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
 
-    FramebufferReader framebufferReader("png", screenWidth, screenHeight);
+    FramebufferReader framebufferReader("jpeg", screenWidth, screenHeight);
 
     // Game loop
     while (FCGX_Accept_r(&request) == 0) {
@@ -143,14 +146,23 @@ int main(int argc, char **argv) {
             //
             // handle render
             if (words.size() >= 18) {
-                for (unsigned int j=0; j<16; j++) {
+                unsigned int j=0;
+                for (; j<16; j++) {
                     m[j] = std::stod(words[j]);
                 }
-                camera.fov = std::stod(words[16]);
-                renderer.useTexture = std::stoi(words[17]);
-                renderer.camX = std::stof(words[18]);
-                renderer.camY = std::stof(words[19]);
-                renderer.camZ = std::stof(words[20]);
+                for (; j<32; j++) {
+                    viewMat[j-16] = std::stod(words[j]);
+                }
+                for (; j<48; j++) {
+                    projMat[j-32] = std::stod(words[j]);
+                }
+                // camera.fov = std::stod(words[16]);
+                renderer.useTexture = std::stoi(words[j++]);
+                // renderer.camX = std::stof(words[j++]);
+                // renderer.camY = std::stof(words[j++]);
+                // renderer.camZ = std::stof(words[j++]);
+                // renderer.camRotX = std::stof(words[j++]);
+                // renderer.camRotY = std::stof(words[j++]);
             } else {
                 camera.fov = 45.0f;
                 renderer.useTexture = 1;
@@ -186,42 +198,46 @@ int main(int argc, char **argv) {
             std::cout << "Content-type: text/html\r\n\r\n" << "ERROR: Invalid route: " << route << std::endl;
         }
 
+        camera.viewMat = glm::make_mat4(viewMat);
+        camera.projectionMat = glm::make_mat4(projMat);
+
+        string seedstr = to_string(renderer.lightPosition[0][0]) + "," + to_string(renderer.lightPosition[0][1]) + "," + to_string(renderer.lightPosition[0][2]);
+        char cstr1[seedstr.size() + 1];
+        strcpy(cstr1, seedstr.c_str());
+        cerr << cstr1 << endl;
+        unsigned int seed = getUIntHash(cstr1);
+        cerr << seed << endl;
+        srand(seed);
+
         // better way to deal with this? do we want to do model by model? or entire scene?
         model0.modelMatrix = glm::make_mat4(m);
         // cerr << to_string(model0.modelMatrix).c_str() << endl;
-        string seedstr = to_string(model0.modelMatrix);
+        // string seedstr = to_string(model0.modelMatrix);
         // cerr << "Seedstr: " << seedstr << endl;
-        char cstr0[seedstr.size() + 1];
-        strcpy(cstr0, seedstr.c_str());
-        unsigned int seed = getUIntHash(cstr0);
-        srand(seed);
+        // char cstr0[seedstr.size() + 1];
+        // strcpy(cstr0, seedstr.c_str());
+        // unsigned int seed = getUIntHash(cstr0);
+        // srand(seed);
         // cerr << "Seed: " << seed << endl;
         int r = rand() % 400;
         // cerr << "Noise Texture: " << r << endl;
-        renderer.noiseTextureId = TextureLoader::TextureFromFile( string("random" +to_string(r)+ ".jpg").c_str(), "res/noise" );
+        // renderer.noiseTextureId = TextureLoader::TextureFromFile( string("random" +to_string(r)+ ".jpg").c_str(), "res/noise" );
         Timer::getInstance()->addTime("Random Texture");
 
         renderer.randomMatrix = makeRandomMat(seed);
         Timer::getInstance()->addTime("Random Matrix");
 
         // Random lights
-        seedstr = to_string(renderer.lightPosition[0][0]) + "," + to_string(renderer.lightPosition[0][1]) + "," + to_string(renderer.lightPosition[0][2]);
-        char cstr1[seedstr.size() + 1];
-        strcpy(cstr1, seedstr.c_str());
-        cerr << cstr1 << endl;
-        seed = getUIntHash(cstr1);
-        cerr << seed << endl;
-        srand(seed);
-
+        
         float lightMax = 2.0;
         float dist = lightMax * (2 * ( (float)rand() / (float)RAND_MAX ) - 1.0);
         float x = rand();
         float y = rand();
         float z = rand();
         float norm = sqrt(x*x + y*y + z*z);
-        // renderer.lightPosition[3][0] = dist * x/norm;
-        // renderer.lightPosition[3][1] = dist * y/norm;
-        // renderer.lightPosition[3][2] = dist * z/norm;
+        renderer.lightPosition[3][0] = dist * x/norm;
+        renderer.lightPosition[3][1] = dist * y/norm;
+        renderer.lightPosition[3][2] = dist * z/norm;
 
         cerr << renderer.lightPosition[3][0] << " " << renderer.lightPosition[3][1] << " " << renderer.lightPosition[3][2] << endl;
 
@@ -231,24 +247,25 @@ int main(int argc, char **argv) {
         y = rand();
         z = rand();
         norm = sqrt(x*x + y*y + z*z);
-        // renderer.lightPosition[0][0] += dist * x/norm;
-        // renderer.lightPosition[0][1] += dist * y/norm;
-        // renderer.lightPosition[0][2] += dist * z/norm;
+        renderer.lightPosition[0][0] += dist * x/norm;
+        renderer.lightPosition[0][1] += dist * y/norm;
+        renderer.lightPosition[0][2] += dist * z/norm;
 
         cerr << renderer.lightPosition[0][0] << " " << renderer.lightPosition[0][1] << " " << renderer.lightPosition[0][2] << endl;
 
         renderer.render( &scene, &camera, &renderMesh );
         Timer::getInstance()->addTime("Render");
 
-
         if (!debugFlag) {
             std::cout << "Content-type: image/jpeg\r\n\r\n";
             framebufferReader.writeFrameToCout();
         }
+
         std::cout << std::endl;
         Timer::getInstance()->addTime("Sent Frame");
 
         Timer::getInstance()->printTimes();
+
     }
     
     renderer.close();

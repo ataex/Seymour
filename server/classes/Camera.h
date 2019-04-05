@@ -9,6 +9,8 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
 
 // Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
 enum Camera_Movement
@@ -31,11 +33,14 @@ class Camera
 {
 public:
     float fov;
+    glm::mat4 viewMat;
+    glm::mat4 projectionMat;
 
     // Constructor with vectors
     Camera( glm::vec3 position = glm::vec3( 0.0f, 0.0f, 0.0f ), float fov = 45.0f ) {
         this->position = position;
         this->fov = fov;
+        this->projectionMat = glm::mat4(1.0);
 
         // this->worldUp = up;
         // this->yaw = yaw;
@@ -61,7 +66,8 @@ public:
     }
     
     glm::mat4 projectionMatrix( int screen_width, int screen_height ) {
-        return glm::perspective( this->fov * (float)M_PI/180, ( float )screen_width/( float )screen_height, 0.1f, 2000.0f );
+        return this->projectionMat;
+        return glm::perspective( 45 * (float)M_PI/180, ( float )screen_width/( float )screen_height, 0.1f, 2000.0f );
     }
 
 private:

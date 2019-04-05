@@ -38,6 +38,8 @@ public:
     }
 
     void writeFrameToCout() {
+        cerr << "here" << endl;
+
         Timer::getInstance()->addTime("Start FramebufferReader");
         // auto start = high_resolution_clock::now(); 
     	// Read the pixels from the frame buffer
@@ -61,7 +63,6 @@ public:
         std::stringstream ss;
         ss << t;
         string str;
-    
     	if (this->extension.compare("png") == 0) {
 	    	str = "./frames/frame" + ss.str() + ".png";
     		writePng(this->pixels, this->screen_width, this->screen_height, str);
@@ -71,7 +72,6 @@ public:
 		}
 
         Timer::getInstance()->addTime("Image Write");
-
 
         // vars for file reading
         FILE * pFile;

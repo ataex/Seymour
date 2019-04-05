@@ -68,10 +68,12 @@ public:
     float camX;
     float camY;
     float camZ;
+    float camRotX;
+    float camRotY;
 
     glm::mat4 randomMatrix;
 
-    int useLight[4] = {1, 0, 0, 0};
+    int useLight[4] = {1, 0, 0, 1};
     float lightPosition[4][3] = {
         {2.0f, 2.0f, 3.0f}, 
         {-2.0f, 2.0f, -3.0f}, 
@@ -96,6 +98,8 @@ public:
         this->camX;
         this->camY;
         this->camZ;
+        this->camRotX;
+        this->camRotY;
 
         this->randomMatrix = glm::mat4(1.0);
 
@@ -111,7 +115,6 @@ public:
             // Render to screen
             glBindFramebuffer(GL_FRAMEBUFFER, this->renderedFramebuffer);
         }
-https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.size.html
         // std::cerr << "Noise: " << this->blendNoisePerc << std::endl;
 
         glClearColor( this->clearColor.x, this->clearColor.y, this->clearColor.z, this->clearColor.w ); // make this a property
@@ -122,7 +125,7 @@ https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.size.html
         // make this a function of the camera
         glm::mat4 projection = camera->projectionMatrix( this->screen_width, this->screen_height );//glm::perspective( 45.0f * (float)M_PI/180, ( float )this->screen_width/( float )this->screen_height, 0.1f, 2000.0f );
 
-        glm::mat4 view = glm::lookAt(glm::vec3(this->camX, this->camY, this->camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::mat4 view = camera->viewMat;//glm::translate(glm::rotate(glm::rotate(glm::mat4(1.0),this->camRotX,glm::vec3(1,0,0)),this->camRotY,glm::vec3(0,1,0)), glm::vec3(-1*this->camX, -1*this->camY, -1*this->camZ)); //glm::lookAt(glm::vec3(this->camX, this->camY, this->camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
         glUniformMatrix4fv( glGetUniformLocation( this->lightingShader->program, "projection" ), 1, GL_FALSE, glm::value_ptr( projection ) );
         glUniformMatrix4fv( glGetUniformLocation( this->lightingShader->program, "view" ), 1, GL_FALSE, glm::value_ptr( view ) );

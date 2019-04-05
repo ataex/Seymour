@@ -114,9 +114,9 @@ void main( )
     // color = vec4( 1.0, 1.0, 1.0, 1.0 );
 
     // Lit rendering
-    color = vec4( result, 1.0 );
+    // color = vec4( result, 1.0 );
     // Unlit redering
-    // color = texture( material.diffuse, TexCoords );
+    color = texture( material.diffuse, TexCoords );
 }
 
 // Calculates the color when using a directional light.
