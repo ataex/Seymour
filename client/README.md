@@ -8,26 +8,26 @@ The Seymour client uses [Three.js](https://threejs.org/) to render a low-resolut
 
 1. Include the seymour.js library and its dependencies in your webpage.
     ```html
-<script src="loaders/PLYLoader.js"></script>
-<script src="three.min.js"></script>
+    <script src="loaders/PLYLoader.js"></script>
+    <script src="three.min.js"></script>
 
-<script src="seymour.js"></script>
+    <script src="seymour.js"></script>
     ```
 1. Create a \<div\> to use for the rendering window and create the Seymour client instance.
     ```html
-<div id="webgl-container"></div>
+    <div id="webgl-container"></div>
 
-<script>
-  var seymour = new Seymour({
-    width: 512,
-    height: 512,
-    backend: "localhost"
-  });
-  
-  var container = document.getElementById( "webgl-container" );
-  seymour.init( container );
-  seymour.loadModel( "./models/ply/fooobar.ply" );
-</script>
+    <script>
+      var seymour = new Seymour({
+        width: 512,
+        height: 512,
+        backend: "localhost"
+      });
+
+      var container = document.getElementById( "webgl-container" );
+      seymour.init( container );
+      seymour.loadModel( "./models/ply/fooobar.ply" );
+    </script>
     ```
 
 [simple-seymour.html](./simple-seymour.html) shows the most basic usage.
