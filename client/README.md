@@ -35,4 +35,4 @@ The Seymour client uses [Three.js](https://threejs.org/) to render a low-resolut
 
 ## Extesibility
 
-seymour.js exposes a number of function calls to interact with the client rendering service. A more complete description will be coming soon, but for now check the file for comments and description.
+[seymour.js](./seymour.js) exposes a number of function calls to interact with the client rendering service. A more complete description will be coming soon, but for now check the file for comments and description.
