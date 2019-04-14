@@ -2,6 +2,8 @@
 
 ## About
 
+The Seymour server uses OpenGL and Fast-CGI to create a long-running, rendering process.
+
 ## Running the examples (under Linux)
 
 ### Installing Dependencies
