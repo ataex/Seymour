@@ -22,5 +22,5 @@ g++ -I ./classes modeltobin.cpp -lGL -lGLEW -lglfw -lSOIL -lassimp modeltobin.o
 # to run headless first execute
 Xvfb :99 &
 export DISPLAY=:99
-# then run program normally
+# then run program normally...
 ```
