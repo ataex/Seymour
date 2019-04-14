@@ -2,7 +2,9 @@
 
 ## About
 
-Seymour is an open source protected remote rendering visualization tool that enables the interactive visualization of high-resolution 3D digital models in a web browser, while ensuring that the 3D assets are secured against unauthorized access. Seymour is built in C++ and JavaScript using OpenGL, Fast-CGI, and Nginx, along with other useful libraries. See the [client](./client) and [server](./server) folders for more complete descriptions of the technologies and set-up for each component.
+Seymour is an open source protected remote rendering visualization tool that enables the interactive visualization of high-resolution 3D digital models in a web browser, while ensuring that the 3D assets are secured against unauthorized access. 
+
+Seymour is built in C++ and JavaScript using OpenGL, Fast-CGI, and Nginx, along with other useful libraries. See the [client](./client) and [server](./server) folders for more complete descriptions of the technologies and set-up for each component.
 
 This software was developed as part of my dissertation project [Extending Model Use in Virtual Heritage: User-Centric Implementation of a Proctected Remote Rendering Visualization Tool](./docs/Christiansen-2019-MiVH.pdf).
 
