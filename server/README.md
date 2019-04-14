@@ -1,11 +1,14 @@
-# Seymour v2
+# Seymour Server Module
+
 ## About
 
 ## Running the examples (under Linux)
+
 ### Installing Dependencies
 ```
 sudo apt-get install libglm-dev libglew-dev libglfw3-dev libsoil-dev libjpeg-dev libfcgi-dev spawn-fcgi nginx xvfb g++ libassimp-dev openssl libssl-dev imagemagick
 ```
+
 ### Backend - Compilation and Running
 ```
 # first cd into the Seymour_v2/seymour directory
