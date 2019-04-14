@@ -19,7 +19,14 @@ The Seymour client uses [Three.js](https://threejs.org/) to render a low-resolut
 <div id="webgl-container"></div>
 
 <script>
-  var seymour
+  var seymour = new Seymour({
+    width: 512,
+    height: 512,
+    backend: "localhost"
+  });
+  
+  var container = document.getElementById( "webgl-container" );
+  seymour.init( container );
 </script>
 ```
 
