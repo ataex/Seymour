@@ -5,6 +5,7 @@
 The Seymour client uses [Three.js](https://threejs.org/) to render a low-resolution reference model.
 
 ## Quickstart
+NOTE: The model loaders require a running webserver.
 
 1. Include the seymour.js library and its dependencies in your webpage.
     ```html
