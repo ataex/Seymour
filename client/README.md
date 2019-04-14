@@ -14,7 +14,7 @@ The Seymour client uses [Three.js](https://threejs.org/) to render a low-resolut
 <script src="seymour.js"></script>
 ```
 
-1. Create a \<div\> to use for the rendering window.
+1. Create a \<div\> to use for the rendering window and create the Seymour client instance.
 ```html
 <div id="webgl-container"></div>
 
@@ -27,6 +27,7 @@ The Seymour client uses [Three.js](https://threejs.org/) to render a low-resolut
   
   var container = document.getElementById( "webgl-container" );
   seymour.init( container );
+  seymour.loadModel( "./models/ply/fooobar.ply" );
 </script>
 ```
 
