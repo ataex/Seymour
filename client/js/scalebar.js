@@ -1,5 +1,5 @@
 var scalebar;
-var unit = 1;
+var unit = 0.01;
 var unitSpan;
 var unitDict = {
 	'0.001' : "Millimeters",
@@ -13,17 +13,17 @@ window.onload = function main() {
 	// Setup Seymour
 	var myElement = document.getElementById('seymour-container');
 	var options = {
-		width: 800, 
-		height: 800, 
-		backend: 'localhost'
+		width: 512, 
+		height: 512, 
+		backend: '10.10.10.100'
 	};
 	seymour = new Seymour( myElement, options );
-	seymour.loadModel( './models/ply/VC_0001_Antoninus_Pious-3k.ply' );
+	seymour.loadModel( './models/ply/queen/queen.ply' );
 
 	// Switch to an orthographic camera
 	var camera = new THREE.OrthographicCamera( -2, 2, 2, -2, 1, 1000 );
 	camera.position.z = 5;
-	seymour.setCamera( camera );
+	seymour.camera = camera;
 
 	// Setup up controls
 	document.onwheel = handleMouseWheel;
@@ -68,7 +68,7 @@ function updateScalebar() {
 	vector.y = - ( vector.y * heightHalf ) + heightHalf;
 
 	var dist = vector.x - widthHalf;
-	var newScalebarWidth = unit * (100 * dist * 5 / 35.5)
+	var newScalebarWidth = 5 * unit * (dist / 0.047);
 
 	if (newScalebarWidth > width) {
 		unit *= 0.1;

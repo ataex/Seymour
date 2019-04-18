@@ -5,17 +5,16 @@ window.onload = function () {
 	var options = {
 		width: 512, 
 		height: 512, 
-		backend: 'localhost'
+		backend: '10.10.10.100'
 	};
 
 	seymour = new Seymour(myElement, options);
-	seymour.loadModel('./models/ply/VC_0001_Antoninus_Pious-3k.ply');
+	seymour.loadModel('./models/ply/queen/queen.ply');
 
 	initHandlers();
 }
 
 function initHandlers() {
-	console.log("Initialize!")
 	document.getElementById("jpeg-num").innerHTML = document.getElementById("jpeg-slider").value;
 	document.getElementById("jpeg-slider").onchange = function () {
 		document.getElementById("jpeg-num").innerHTML = this.value;
@@ -43,5 +42,5 @@ function initHandlers() {
 }
 
 function changeDistortion() {
-	seymour.imgOverlay.src = "http://" + host + "/renderer/distortions/" + document.getElementById("jpeg-slider").value + "," + (document.getElementById("noise-slider").value/1000) + "," + (document.getElementById("trans-checkbox").checked?1:0) + "," + (document.getElementById("rotate-checkbox").checked?1:0) + "," + (document.getElementById("scale-checkbox").checked?1:0) + "," + (document.getElementById("geo-dist-slider").value/1000) ;
+	seymour.imgOverlay.src = "http://" + seymour.host + "/renderer/distortions/" + document.getElementById("jpeg-slider").value + "," + (document.getElementById("noise-slider").value/1000) + "," + (document.getElementById("trans-checkbox").checked?1:0) + "," + (document.getElementById("rotate-checkbox").checked?1:0) + "," + (document.getElementById("scale-checkbox").checked?1:0) + "," + (document.getElementById("geo-dist-slider").value/1000) ;
 }

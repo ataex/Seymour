@@ -8,10 +8,10 @@ window.onload = function main() {
 	var options = {
 		width: 512, 
 		height: 512, 
-		backend: 'localhost'
+		backend: '10.10.10.100'
 	};
 	seymour = new Seymour( myElement, options );
-	seymour.loadModel( './models/ply/VC_0001_Antoninus_Pious-3k.ply' );
+	seymour.loadModel( './models/ply/queen/queen.ply' );
 
 	// Setup event handlers
 	document.getElementById( 'record-btn' ).onclick = handleRecordBtn;
