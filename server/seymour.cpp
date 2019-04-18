@@ -53,8 +53,8 @@
 using namespace std;
 
 bool debugFlag = false;
-int screenWidth = 512;
-int screenHeight = 512;
+int screenWidth = 800;
+int screenHeight = 800;
 
 vector<int> randomOrder;
 float distortionMax = 0.01;
@@ -86,8 +86,8 @@ int main(int argc, char **argv) {
     Scene scene;
     Camera camera(glm::vec3( 0.0f, 0.0f, 0.0f ), 45.0f);
     // Model model0( "res/models/cube/cube.obj" );
-    // Model model0( "res/models/antoninus_pious/VC_0001_Antoninus_Pious-7m.obj" );
-    Model model0( "res/models/saint-nicodeme-plumeliau/saint-nicodeme-plumeliau.obj" );
+    Model model0( "res/models/antoninus_pious/VC_0001_Antoninus_Pious-7m.obj" );
+    // Model model0( "res/models/saint-nicodeme-plumeliau/saint-nicodeme-plumeliau.obj" );
     std::cerr << "Model loaded" << std::endl;
     // Model model0( "res/models/sphere/sphere.obj" );
     // scene.add( &model1 );
@@ -145,7 +145,7 @@ int main(int argc, char **argv) {
         if ( route.compare("render") == 0 ) {
             //
             // handle render
-            if (words.size() >= 18) {
+            if (words.size() >= 48) {
                 unsigned int j=0;
                 for (; j<16; j++) {
                     m[j] = std::stod(words[j]);
@@ -156,36 +156,29 @@ int main(int argc, char **argv) {
                 for (; j<48; j++) {
                     projMat[j-32] = std::stod(words[j]);
                 }
-                // camera.fov = std::stod(words[16]);
                 renderer.useTexture = std::stoi(words[j++]);
-                // renderer.camX = std::stof(words[j++]);
-                // renderer.camY = std::stof(words[j++]);
-                // renderer.camZ = std::stof(words[j++]);
-                // renderer.camRotX = std::stof(words[j++]);
-                // renderer.camRotY = std::stof(words[j++]);
             } else {
-                camera.fov = 45.0f;
                 renderer.useTexture = 1;
             }
-            //
         } else if ( route.compare("light") == 0 ) {
             //
             // handle light
-            int i = 0;
-            renderer.useLight[0] = std::stoi(words[i]);
-            i++;
-            for (int j=0; j<3; j++) {
-                renderer.lightPosition[0][j] = std::stod(words[i+j]);
-            }
-            i+=3;
+            if (words.size() >= 6) {
+                int i = 0;
+                renderer.useLight[0] = std::stoi(words[i]);
+                i++;
+                for (int j=0; j<3; j++) {
+                    renderer.lightPosition[0][j] = std::stod(words[i+j]);
+                }
+                i+=3;
 
-            renderer.useLight[1] = std::stoi(words[i]);
-            i++;
-            for (int j=0; j<3; j++) {
-                renderer.lightPosition[1][j] = std::stod(words[i+j]);
+                renderer.useLight[1] = std::stoi(words[i]);
+                i++;
+                for (int j=0; j<3; j++) {
+                    renderer.lightPosition[1][j] = std::stod(words[i+j]);
+                }
+                i+=3;
             }
-            i+=3;
-            //
         } else if ( route.compare("distortions") == 0 ) {
             framebufferReader.jpegQuality = std::stoi(words[0]);
             renderer.blendNoisePerc = std::stof(words[1]);

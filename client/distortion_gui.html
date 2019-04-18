@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+	<title>Seymour | Distortion GUI</title>
+
+	<style type="text/css">
+		html,
+		body {
+		  height: 100%;
+		  margin: 0
+		}
+
+		/* Layout */
+
+		.border-box {
+			border: 2px solid #000;
+			border-radius: 5px;
+			background-color: #DDD;
+		}
+
+		.box {
+		  display: flex;
+		  flex-flow: column;
+		  height: 100%;
+		}
+
+		.box .row.shrink {
+		  flex: 0 1 auto;
+		}
+
+		.row {
+			padding: 1em;
+			margin: 5px;
+			display: flex;
+			align-items: center;
+			justify-content: flex-start;
+		}
+
+		.three {
+			flex: 0 0 512px;
+			height: 512px;
+			background: #999;
+		}
+
+		/* Controls */
+
+		#controls {
+			padding: 10px;
+		}
+
+
+	</style>
+
+</head>
+<body oncontextmenu="return false;">	
+	<div class="box">
+		<div class="row shrink border-box">
+
+			<div id="seymour-container" class="three"></div>
+
+			<div id="controls">
+				<h3>Image Distortions</h3>
+				<span>JPEG Quality: </span><br>
+				<input type="range" min="1" max="90" value="40" class="slider" id="jpeg-slider">
+				<span id="jpeg-num">40</span>
+				<br>
+				<span>Hi-freq Noise %: </span><br>
+				<input type="range" min="500" max="1000" value="980" class="slider" id="noise-slider">
+				<span id="noise-num">98%</span>
+				<br>
+				<h3>Light Distortions</h3>
+				<input type="checkbox" id="trans-checkbox"><span>Random Light</span>
+				<br><br>
+				<span>Max distance: </span><br>
+				<input type="range" min="0" max="50" value="1" class="slider" id="geo-dist-slider">
+				<span id="geo-dist-num">0.01</span>
+				<br>
+				<h3>Geometric Distortions</h3>
+				<input type="checkbox" id="trans-checkbox"><span>Translate</span>
+				<input type="checkbox" id="scale-checkbox"><span>Scale</span>
+				<input type="checkbox" id="rotate-checkbox"><span>Rotate</span>
+				<br><br>
+				<span>Max distance: </span><br>
+				<input type="range" min="0" max="50" value="1" class="slider" id="geo-dist-slider">
+				<span id="geo-dist-num">0.01</span>
+			</div>
+		</div>
+
+	</div>
+
+	<script src="js/three.js"></script>
+	<script src="js/hammer.js"></script>
+	<script src="js/loaders/PLYLoader.js"></script>
+	<script src="js/seymour.js"></script>
+
+	<script src="js/distortion_gui.js"></script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+	<title>Seymour | Path Render</title>
+
+	<style type="text/css">
+		html,
+		body {
+		  height: 100%;
+		  margin: 0
+		}
+
+		/* Layout */
+
+		.border-box {
+			border: 2px solid #000;
+			border-radius: 5px;
+			background-color: #DDD;
+		}
+
+		.box {
+		  display: flex;
+		  flex-flow: column;
+		  height: 100%;
+		}
+
+		.box .row.shrink {
+		  flex: 0 1 auto;
+		}
+
+		.row {
+			padding: 1em;
+			margin: 5px;
+			display: flex;
+			align-items: center;
+			justify-content: flex-start;
+		}
+
+		.three {
+			flex: 0 0 512px;
+			height: 512px;
+			background: #999;
+		}
+
+		/* Controls */
+
+		#controls {
+			padding: 10px;
+		}
+
+		#record-btn {
+			width: 52px;
+			padding: 2px;
+		}
+
+		#record-icon {
+			height: 25px;
+			width: 25px;
+			background-color: #f00;
+			display: inline-block;
+		}
+
+		.dot {
+			border-radius: 50%;
+		}
+
+		.to-square {
+			border-radius: 15%;
+			transition: border-radius 0.4s ease-out;
+		}
+
+		.to-dot {
+			border-radius: 50%;
+			transition: border-radius 0.4s ease-out;
+		}
+	</style>
+
+</head>
+<body oncontextmenu="return false;">	
+	<div class="box">
+		<div class="row shrink border-box">
+			<div id="seymour-container" class="three"></div>
+			<div id="controls">
+				<button id="record-btn" input="button">
+					<span id="record-icon" class="dot"></span>
+					<br>
+					<span id="record-txt">Start</span>
+		        </button>
+		        <br>
+		        <br>
+			  	<input id="frame-slider" type="range" min="0" max="100" value="0">
+			  	<br>
+			  	<button id="animate-btn" input="button">Animate<br>Start</button>
+			</div>
+		</div>
+	</div>
+
+	<script src="js/three.js"></script>
+	<script src="js/hammer.js"></script>
+	<script src="js/loaders/PLYLoader.js"></script>
+	<script src="js/seymour.js"></script>
+
+	<script src="js/path_render.js"></script>
+</body>
+</html>

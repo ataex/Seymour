@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+	<title>Seymour | Scalebar</title>
+
+	<style type="text/css">
+		html,
+		body {
+		  height: 100%;
+		  margin: 0
+		}
+
+		/* Layout */
+
+		.border-box {
+			border: 2px solid #000;
+			border-radius: 5px;
+			background-color: #DDD;
+			padding: 1em;
+			margin: 5px;
+		}
+
+		/* Controls */
+
+		#controls {
+			padding: 10px;
+		}
+
+		#navigation-dropdown {
+			margin-left: 10px;
+		}
+
+		/* Scalebar */
+		#scalebar-container {
+			width: 100%	;
+			position: relative;
+		}
+
+		#units {
+			position: absolute;
+			display: inline;
+			float: right;
+			top: 12px;
+			left: 512px;
+		}
+
+		.scalebar {
+			display: flex;
+			height: 24px;
+			width: 100%;
+		}
+
+		.scalebar > .tick:nth-child(even) {
+			background-color: black;
+		}
+
+		.scalebar > .tick:nth-child(odd) {
+			background-color: white;
+		}
+
+		.invert > .tick:nth-child(even) {
+			background-color: white;
+		}
+
+		.invert > .tick:nth-child(odd) {
+			background-color: black;
+		}
+
+		.tick {
+			flex-grow: 1;
+			flex-shrink: 1;
+			flex-basis: 0;
+			text-align: left;
+			border: 1px solid black;
+		}
+
+		.num {
+			flex-grow: 1;
+			flex-shrink: 1;
+			flex-basis: 0;
+			text-align: left;
+		}
+
+		.final-num {
+			display: inline;
+			float: right;
+		}
+	</style>
+
+</head>
+<body oncontextmenu="return false;">	
+	<div class="box">
+		<div class="border-box">
+			<div id="seymour-container"></div>
+
+			<div id="thing">
+			<div id="scalebar-container">
+				<div class="scalebar">
+					<div class="tick"></div>
+					<div class="tick"></div>
+					<div class="tick"></div>
+					<div class="tick"></div>
+					<div class="tick"></div>
+				</div>
+				<div class="scalebar invert">
+					<div class="tick"></div>
+					<div class="tick"></div>
+					<div class="tick"></div>
+					<div class="tick"></div>
+					<div class="tick"></div>
+				</div>
+				<div class="scalebar">
+					<div class="num">0</div>
+					<div class="num">1</div>
+					<div class="num">2</div>
+					<div class="num">3</div>
+					<div class="num">4</div>
+					<span class="final-num">5</span>
+				</div>
+				<span id="units">Meters</span>
+			</div>
+			</div>
+		</div>
+		
+	</div>
+
+	<script src="js/three.js"></script>
+	<script src="js/hammer.js"></script>
+	<script src="js/loaders/PLYLoader.js"></script>
+	<script src="js/seymour.js"></script>
+
+	<script src="js/scalebar.js"></script>
+</body>
+</html>
