@@ -1,4 +1,4 @@
-# Seymour Server Module
+# Seymour Server
 
 ## About
 
@@ -35,7 +35,24 @@ The Seymour server uses OpenGL and Fast-CGI to create a long-running, rendering 
     Xvfb :99 &
     export DISPLAY=:99
     # then run program normally...
-  ```
+    ```
+
+### Troubleshooting
+
+The calls to render, glDraw* are asynchronous, this means that for slower machines the frame may not be finished drawing before it is read with glReadPixels and streamed to the client. If the client appears to be a frame behind, or to be receiving erroneous frames, in seymour.cpp change the line:
+
+```c++
+renderer.render( &scene, &camera, &renderMesh, true );
+```
+
+to
+
+```c++
+renderer.render( &scene, &camera, &renderMesh, false );
+```
+
+For especially slow machines, uncomment the sleep_for function on the following line to add a wait time. However, at this point, Seymour may not be right for your machine...
+
 
 ## Customization
 
