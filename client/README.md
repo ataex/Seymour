@@ -33,6 +33,6 @@ NOTE: The model loaders require a running webserver.
 
 [simple-seymour.html](./simple-seymour.html) shows the most basic usage.
 
-## Extesibility
+## Documentation
 
-[seymour.js](./seymour.js) exposes a number of function calls to interact with the client rendering service. A more complete description will be coming soon, but for now check the file for comments and description.
+See [docs](./docs) for documentation of [seymour.js](./seymour.js) and its exposed methods and properties. The [Three.js](https://threejs.org/) scene elements are directly exposed, and may be manipulated according to the [Three.js](https://threejs.org/) documentation.
