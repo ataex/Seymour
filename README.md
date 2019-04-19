@@ -17,10 +17,23 @@ Seymour is a client-server architecture and requires a properly configured Nginx
     ```bash
     sudo apt-get install nginx
     ```
-1. [Configure and start Nginx](./server/README.md#configure-nginx).
+1. Configure and start Nginx. [server/nginx.conf](./server/nginx.conf) contains a sample configuration.
+    ```bash
+    # cd to the root of Seymour directoy
+    cd ~/Seymour
+    # save the default nginx.conf file
+    sudo mv /etc/nginx/nginx.conf /etc/nginx/nginx-default.conf
+    # copy the sample nginx.conf
+    sudo cp server/nginx.conf /etc/nginx/nginx.conf
+    # restart nginx
+    sudo nginx -s stop
+    sudo nginx
+    ```
 1. Copy the Seymour client to the Nginx web root, by defualt /var/www/html.
     ```bash
-    # in root of Seymour directory
+    # cd to the root of Seymour directory
+    cd ~/Seymour
+    # copy all client code to the web root
     sudo cp client/* /var/www/html
     ```
 1. [Compile the Seymour server and start the FCGI process](./server/README.md#backend---compilation-and-running).
