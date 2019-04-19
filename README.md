@@ -48,4 +48,4 @@ Seymour is a client-server architecture and requires a properly configured Nginx
           author={Christiansen, Leif},
           year={2019},
           school={Indiana University}
-    }
+        }
