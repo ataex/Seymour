@@ -20,8 +20,9 @@ The Seymour server uses OpenGL and Fast-CGI to create a long-running, rendering 
     ```
 1. Generate the noise textures.
     ```sh
-    # first cd into the Seymour/server directory
-    cd ~/Seymour/server
+    # first cd into the Seymour/server/res/noise directory
+    cd ~/Seymour/server/res/noise
+    # be sure your in the proper directory! noise images will be placed in current directory
     # execute the supplied script
     ./res/noise/gennoise.sh
     ```
