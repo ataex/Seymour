@@ -19,7 +19,7 @@ g++ <path to fcgi program> -lfcgi++ -lfcgi -o fcgi_script.o
 # spawn the fcgi app on port 8000 with no fork
 spawn-fcgi -p 8000 -n fcgi_script.o
 ```
-To see the fcgi scripts in action, you may use curl:
+To see the fcgi scripts in action navigate to [http://localhost](http://localhost). Or to make a request with arguments, you may use curl:
 ```sh
 # curl request
 curl http://localhost
