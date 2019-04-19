@@ -14,7 +14,7 @@ See [examples](./examples) for simple samples of OpenGL and Fast-CGI code, usefu
 
 Seymour is a client-server architecture and requires a properly configured Nginx server.
 1. [Download and install Nginx](http://nginx.org/en/docs/install.html).
-    ```bash
+    ```sh
     sudo apt-get install nginx
     ```
 1. Configure and start Nginx. [server/nginx.conf](./server/nginx.conf) contains a sample configuration.
@@ -30,7 +30,7 @@ Seymour is a client-server architecture and requires a properly configured Nginx
     sudo nginx
     ```
 1. Copy the Seymour client to the Nginx web root, by defualt /var/www/html.
-    ```bash
+    ```sh
     # cd to the root of Seymour directory
     cd ~/Seymour
     # copy all client code to the web root
