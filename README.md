@@ -6,7 +6,7 @@ Seymour is an open source protected remote rendering visualization tool that ena
 
 Seymour is built in C++ and JavaScript using OpenGL, Fast-CGI, and Nginx, along with other useful libraries. See the [client](./client) and [server](./server) folders for more complete descriptions of the technologies and set-up for each component.
 
-This software was developed as part of my dissertation project [Extending Model Use in Virtual Heritage: User-Centric Implementation of a Proctected Remote Rendering Visualization Tool](./Christiansen-2019-MiVH.pdf).
+This software was developed as part of my dissertation project [Extending Model Use in Virtual Heritage: User-Centric Implementation of a Proctected Remote Rendering Visualization Tool](./Christiansen-2019-ModelUseVH.pdf).
 
 ## Getting Started
 
@@ -21,7 +21,7 @@ Seymour is a client-server architecture and requires a properly configured Nginx
 
 To cite:
 
-        @phdthesis{christiansen2019modeluse,
+        @phdthesis{christiansen2019modelusevh,
           title={Extending Model Use in Virtual Heritage: User-Centric Implementation of a Proctected Remote Rendering Visualization Tool},
           author={Christiansen, Leif},
           year={2019},
