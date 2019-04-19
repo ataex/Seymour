@@ -33,6 +33,8 @@ NOTE: The model loaders require a running webserver.
 
 [simple-seymour.html](./simple-seymour.html) shows the most basic usage.
 
+[features](./features) contains web pages with more advances use cases.
+
 ## Documentation
 
 See [docs](./docs) for documentation of [seymour.js](./seymour.js) and its exposed methods and properties. The [Three.js](https://threejs.org/) scene elements are directly exposed, and may be manipulated according to the [Three.js](https://threejs.org/) documentation.
