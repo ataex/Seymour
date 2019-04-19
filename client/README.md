@@ -14,7 +14,7 @@ NOTE: The model loaders require a running webserver.
 
     <script src="seymour.js"></script>
     ```
-1. Create a \<div\> to use for the rendering window and create the Seymour client instance.
+1. Create a \<div\> to use for the rendering window and create the Seymour client instance. Make sure to set the backend option appropriately, the examples use localhost.
     ```html
     <div id="webgl-container"></div>
 
