@@ -60,7 +60,7 @@ int screenHeight = 800;
 vector<int> randomOrder;
 float distortionMax = 0.01;
 
-void split(const std::string& str, std::vector<std::string>& cont, char delim);
+void split(const string& str, vector<string>& cont, char delim);
 void swap(int* arr, int i, int j);
 void shuffle(int* arr, int start, int end);
 unsigned int getUIntHash(const char* s);
@@ -115,7 +115,7 @@ int main(int argc, char **argv) {
         // cerr.rdbuf(&cerr_fcgi_streambuf);    
 
         char * uri = FCGX_GetParam("REQUEST_URI", request.envp);
-        std::string uri_str(uri);
+        string uri_str(uri);
 
         //
         // get route
@@ -130,42 +130,42 @@ int main(int argc, char **argv) {
         i = temp2.find('/');
         string route = temp2.substr(0,i);
 
-        std::vector<std::string> words;
+        vector<string> words;
         split(temp2.substr(i+1,temp2.length()), words, ',');
 
         if ( route.compare("render") == 0 ) {
             // handle render
             if (words.size() >= 48) {
                 int j=0;
-                for (; j<16; j++) modelMatrix[j] = std::stod(words[j]);
-                for (; j<32; j++) viewMatrix[j-16] = std::stod(words[j]);
-                for (; j<48; j++) projectionMatrix[j-32] = std::stod(words[j]);
-                renderer.useTexture = std::stoi(words[j++]);
+                for (; j<16; j++) modelMatrix[j] = stod(words[j]);
+                for (; j<32; j++) viewMatrix[j-16] = stod(words[j]);
+                for (; j<48; j++) projectionMatrix[j-32] = stod(words[j]);
+                renderer.useTexture = stoi(words[j++]);
             } 
         } else if ( route.compare("light") == 0 ) {
             // handle light
             if (words.size() >= 6) {
                 int i = 0;
-                renderer.useLight[0] = std::stoi(words[i]);
+                renderer.useLight[0] = stoi(words[i]);
                 i++;
-                for (int j=0; j<3; j++) renderer.lightPosition[0][j] = std::stod(words[i+j]);
+                for (int j=0; j<3; j++) renderer.lightPosition[0][j] = stod(words[i+j]);
                 i+=3;
-                renderer.useLight[1] = std::stoi(words[i]);
+                renderer.useLight[1] = stoi(words[i]);
                 i++;
                 
-                for (int j=0; j<3; j++) renderer.lightPosition[1][j] = std::stod(words[i+j]);
+                for (int j=0; j<3; j++) renderer.lightPosition[1][j] = stod(words[i+j]);
                 i+=3;
             }
         } else if ( route.compare("distortions") == 0 ) {
-            framebufferReader.jpegQuality = std::stoi(words[0]);
-            renderer.blendNoisePerc = std::stof(words[1]);
+            framebufferReader.jpegQuality = stoi(words[0]);
+            renderer.blendNoisePerc = stof(words[1]);
             randomOrder.clear();
-            if (std::stoi(words[2]) == 1) randomOrder.push_back(0);
-            if (std::stoi(words[3]) == 1) randomOrder.push_back(1);
-            if (std::stoi(words[4]) == 1) randomOrder.push_back(2);
-            distortionMax = std::stof(words[5]);
+            if (stoi(words[2]) == 1) randomOrder.push_back(0);
+            if (stoi(words[3]) == 1) randomOrder.push_back(1);
+            if (stoi(words[4]) == 1) randomOrder.push_back(2);
+            distortionMax = stof(words[5]);
         } else {
-            std::cout << "Content-type: text/html\r\n\r\n" << "ERROR: Invalid route: " << route << std::endl;
+            cout << "Content-type: text/html\r\n\r\n" << "ERROR: Invalid route: " << route << endl;
         }
 
         camera.viewMat = glm::make_mat4(viewMatrix);
@@ -188,8 +188,8 @@ int main(int argc, char **argv) {
         renderer.randomMatrix = makeRandomMat(seed);
 
         // High frequency noise
-        // int r = rand() % 400;
-        // renderer.noiseTextureId = TextureLoader::TextureFromFile( string("random" +to_string(r)+ ".jpg").c_str(), "res/noise" );
+        int r = rand() % 400;
+        renderer.noiseTextureId = TextureLoader::TextureFromFile( string("random" +to_string(r)+ ".jpg").c_str(), "res/noise" );
 
         // Random lights
         float lightMax = 2.0;
@@ -217,9 +217,10 @@ int main(int argc, char **argv) {
         //
         renderer.render( &scene, &camera, &renderMesh );
 
-        std::cout << "Content-type: image/jpeg\r\n\r\n";
+
+        cout << "Content-type: image/jpeg\r\n\r\n";
         framebufferReader.writeFrameToCout();
-        std::cout << std::endl;
+        cout << endl;
     }
     
     renderer.close();
@@ -233,11 +234,11 @@ int main(int argc, char **argv) {
 }
 
 // http://www.martinbroadhurst.com/how-to-split-a-string-in-c.html
-void split(const std::string& str, std::vector<std::string>& cont, char delim = ' ')
+void split(const string& str, vector<string>& cont, char delim = ' ')
 {
-    std::stringstream ss(str);
-    std::string token;
-    while (std::getline(ss, token, delim)) {
+    stringstream ss(str);
+    string token;
+    while (getline(ss, token, delim)) {
         cont.push_back(token);
     }
 }
@@ -247,7 +248,7 @@ unsigned int getUIntHash(const char* s) {
     MD5((unsigned char*)&s, strlen(s), (unsigned char*)&digest);    
     char mdString[33]; 
     for(int i = 0; i < 8; i++) sprintf(&mdString[i*2], "%02x", (unsigned int)digest[i]);
-    unsigned int x = std::stoul(mdString, nullptr, 16);
+    unsigned int x = stoul(mdString, nullptr, 16);
     return x;
 }
 
@@ -271,8 +272,8 @@ glm::mat4 makeRandomMat(unsigned int seed) {
 
     srand(seed);
     
-    std::default_random_engine gen;
-    std::uniform_real_distribution<double> d(0.0,1.0);
+    default_random_engine gen;
+    uniform_real_distribution<double> d(0.0,1.0);
 
     shuffle(randomOrder, 0, randomOrder.size()-1);
 

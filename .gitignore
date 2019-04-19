@@ -1,5 +1,4 @@
 # Don't track these files
-*frame*
 server/*frames*.*
 server/frames/*.png
 server/frames/*.jpg
