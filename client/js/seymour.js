@@ -20,38 +20,70 @@ along with this program.  If not, see <https://creativecommons.org/licenses/by-n
 //----------------------------------------------------------------------------------------
 // version
 const SEYMOUR_VERSION = '0.1';
-// interaction modes
+
+/**
+ * Enumeration for interaction modes.
+ * @property {number} translate
+ * @property {number} rotate
+ * @property {number} light
+ */
 const INTERACTION_ENUM = Object.freeze({
 	'translate': 0,
 	'rotate':    1,
 	'light':     2
 });
 
+/**
+ * An instance of the seymour client, adding the rendering canvas to the supplied html element.
+ * @property {boolean} isResizable If true, client canvas will resize with window.
+ * @property {boolean} doRequestRender If true, requests will be sent for server renderings.
+ * @property {Object} interactionMode Current mode as INTERACTION_ENUM.
+ * @property {boolean} serverTexture Request render from server with/without texture.
+ * @property {Object} rotationMatrix <a src="https://threejs.org/docs/#api/en/math/Matrix4">THREE.Matrix4</a> storing the rotation of this.models.
+ * @property {Object} container Reference to div element containing the client canvas and imgOverlay.
+ * @property {Object} imgOverlay Reference to img element holding rendered server frame.
+ * @property {Object} scene <a src="https://threejs.org/docs/#api/en/scenes/Scene">THREE.Scene</a>.
+ * @property {Object} camera <a src="https://threejs.org/docs/#api/en/cameras/Camera">THREE.Camera</a>, is THREE.PerspectiveCamera by default.
+ * @property {Object} models <a src="https://threejs.org/docs/#api/en/core/Object3D">THREE.Object3D</a> containing models for interaction.
+ * @property {Object} pointLight0 <a src="https://threejs.org/docs/#api/en/lights/PointLight">THREE.PointLight</a>
+ * @property {Object} pointLight1 <a src="https://threejs.org/docs/#api/en/lights/PointLight">THREE.PointLight</a>
+ * @property {Object} pointLight2 <a src="https://threejs.org/docs/#api/en/lights/PointLight">THREE.PointLight</a>
+ * @param {Object} myElement The html element.
+ * @param {Object} options Options for Seymour instance.
+ */
 function Seymour( myElement, options ) {
 	this._init( myElement, options );
 	console.log( 'Seymour version: ' + SEYMOUR_VERSION );
 }
 
-// TODO see presenter.js for encapsulate all functions
 Seymour.prototype = {
 	//----------------------------------------------------------------------------------------
 	// SETUP
 	//----------------------------------------------------------------------------------------
+	/**
+	 * Initialize Seymour object, create client rendering canvas, and render the first frame.
+	 * @private
+	 * @param {Object} myElement
+	 * @param {Object} options
+	 */
 	_init : function( myElement, options ) {
 		options = options || {};
 
+		//
+		// init properties
+		//
 		// set defaults
-		this.windowWidth = options.width;
-		this.windowHeight = options.height;
-		this.host = options.backend;
+		this._windowWidth = options.width;
+		this._windowHeight = options.height;
+		this._host = options.backend;
 		this.isResizable = options.resizable;
 		
 		this.doRequestRender = true;
-		this.objectInteraction = true;
-		this.inputIsDown = false;
+		this._objectInteraction = true;
+		this._inputIsDown = false;
 		this.interactionMode = INTERACTION_ENUM.translate; 
 		this.serverTexture = true;
-		this.m = new THREE.Matrix4(); // temp matrix
+		this._m = new THREE.Matrix4(); // temp matrix
 		this.rotationMatrix = new THREE.Matrix4();
 
 		// container
@@ -60,7 +92,7 @@ Seymour.prototype = {
 		myElement.appendChild( this.container );
 
 		// <img> for rendered frames 
-		this.imgOverlay = this._createImgOverlay( this.windowWidth, this.windowHeight );
+		this.imgOverlay = this._createImgOverlay( this._windowWidth, this._windowHeight );
 		this.container.appendChild( this.imgOverlay)		
 		this.hideOverlay();
 
@@ -73,7 +105,7 @@ Seymour.prototype = {
 		this.scene = new THREE.Scene();
 
 		this.camera = new THREE.PerspectiveCamera( 
-			45, this.windowWidth / this.windowHeight, 0.1, 2000 
+			45, this._windowWidth / this._windowHeight, 0.1, 2000 
 		);
 		this.camera.position.z = 5;
 		this.camera.updateMatrixWorld();
@@ -97,7 +129,7 @@ Seymour.prototype = {
 
 		this.renderer = new THREE.WebGLRenderer();
 		this.renderer.setPixelRatio( window.devicePixelRatio );
-		this.renderer.setSize( this.windowWidth, this.windowHeight );
+		this.renderer.setSize( this._windowWidth, this._windowHeight );
 
 		//
 		// event listeners
@@ -130,6 +162,13 @@ Seymour.prototype = {
 		this._render();
 	},
 
+	/**
+	 * Create img to hold rendered server frames and overlay client canvas.
+	 * @private
+	 * @param {Object} width
+	 * @param {Object} height
+	 * @return {Object} Reference to created img element
+	 */
 	_createImgOverlay : function( width, height ) {
 		var imgOverlay = document.createElement( 'img' );
 		imgOverlay.id = 'seymour-img-overlay';
@@ -164,23 +203,38 @@ Seymour.prototype = {
 	//----------------------------------------------------------------------------------------
 	// RENDERING
 	//----------------------------------------------------------------------------------------
+	/**
+	 * Render scene in client canvas.
+	 * @private
+	 */
 	_render : function() {
 		this.renderer.render( this.scene, this.camera );
 	},
 
+	/**
+	 * Create and return server URI for current frame.
+	 * @private
+	 * @param {boolean} useDefault Flag to use default URI
+	 * @return {string} URI
+	 */
 	_renderString : function( useDefault=false ) {
 		if (useDefault)
-			return 'http://'+this.host+'/renderer/render/1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,1,0,0,0,0,1,0,0,0,0,1,0,0,0,-5,1,2.4142135623730954,0,0,0,0,2.4142135623730954,0,0,0,0,-1.00010000500025,-1,0,0,-0.200010000500025,0,1';
-		return 'http://' + this.host + '/renderer/render/' + 
+			return 'http://'+this._host+'/renderer/render/1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,1,0,0,0,0,1,0,0,0,0,1,0,0,0,-5,1,2.4142135623730954,0,0,0,0,2.4142135623730954,0,0,0,0,-1.00010000500025,-1,0,0,-0.200010000500025,0,1';
+		return 'http://' + this._host + '/renderer/render/' + 
 			this.models.matrix.elements.toString() + ',' + 
 			this.camera.matrixWorldInverse.elements.toString() + ',' + 
 			this.camera.projectionMatrix.elements.toString() + ',' + 
 			(this.serverTexture?1:0);
 	},
 
+	/**
+	 * Description
+	 * @private
+	 * @return {Object} description
+	 */
 	_lightString : function() {
 		var pos = this.pointLight0.position;
-		var path = 'http://' + this.host + '/renderer/light/' + 
+		var path = 'http://' + this._host + '/renderer/light/' + 
 			(this.pointLight0.visible?1:0) + ',' 
 			+ pos.x + ',' + pos.y + ','+ pos.z;
 		path += ",";
@@ -190,10 +244,18 @@ Seymour.prototype = {
 		return path;
 	},
 
+	/**
+	 * Description
+	 * @private
+	 */
 	_requestRenderTimeout : function() {
 		this.seymour._requestRender();
 	},
 
+	/**
+	 * Description
+	 * @private
+	 */
 	_requestRender : function() {
 		var path;
 		if (this.interactionMode == INTERACTION_ENUM.light) {
@@ -207,6 +269,10 @@ Seymour.prototype = {
 	//----------------------------------------------------------------------------------------
 	// EVENT HANDLERS
 	//----------------------------------------------------------------------------------------
+	/**
+	 * Resize the client canvas to fill the window.
+	 * @private
+	 */
 	onWindowResize : function() {
 		if (!this.isResizable) return;
 
@@ -229,7 +295,12 @@ Seymour.prototype = {
 		this._requestRender();
 	},
 
-	zoom : function(delta) {
+	/**
+	 * Zoom by changing the FOV of the camera.
+	 * @private
+	 * @param {number} delta
+	 */
+	zoom : function( delta ) {
 		clearTimeout(this.interval);
 
 		var newFov = this.camera.fov + delta/2;
@@ -240,12 +311,18 @@ Seymour.prototype = {
 
 		this._render();
 		if (this.doRequestRender) {
-			this.interval = setTimeout(this._requestRenderTimeout, 200);
+			this.interval = setTimeout( this._requestRenderTimeout, 200 );
 		}
 	},
 
-	onInputStart : function(x, y) {
-		this.inputIsDown = true;
+	/**
+	 * Initialize input variables.
+	 * @private
+	 * @param {number} x
+	 * @param {number} y
+	 */
+	onInputStart : function( x, y ) {
+		this._inputIsDown = true;
 		this.xInput = x;
 		this.yInput = y;
 		this.xInputPrev = this.xInput;
@@ -253,8 +330,14 @@ Seymour.prototype = {
 		this._render();
 	},
 
-	onInputMove : function(x, y) {
-		if (!this.inputIsDown) return;
+	/**
+	 * Apply appropriate interactionMode, see INTERACTION_ENUM.
+	 * @private
+	 * @param {number} x
+	 * @param {number} y
+	 */
+	onInputMove : function( x, y ) {
+		if (!this._inputIsDown) return;
 
 		this.xInput = x;
 		this.yInput = y;
@@ -265,10 +348,10 @@ Seymour.prototype = {
 
 		var current = this.models;
 		if (this.interactionMode == INTERACTION_ENUM.translate) {
-			current.position.x += -this.xDelta / this.windowWidth;
-			current.position.y += this.yDelta / this.windowHeight;
+			current.position.x += -this.xDelta / this._windowWidth;
+			current.position.y += this.yDelta / this._windowHeight;
 		} else if (this.interactionMode == INTERACTION_ENUM.rotate) {
-			if (this.objectInteraction) {
+			if (this._objectInteraction) {
 				this.rotationMatrix.premultiply(
 					this._rollingBall(-this.xDelta, this.yDelta)
 				);
@@ -276,8 +359,8 @@ Seymour.prototype = {
 			}
 		} else if (this.interactionMode == INTERACTION_ENUM.light) {
 			this.pointLight0.position.set( 
-				this.pointLight0.position.x-this.xDelta/this.windowWidth,
-				this.pointLight0.position.y+this.yDelta/this.windowHeight,
+				this.pointLight0.position.x-this.xDelta/this._windowWidth,
+				this.pointLight0.position.y+this.yDelta/this._windowHeight,
 				this.pointLight0.position.z
 			);
 		}
@@ -285,16 +368,27 @@ Seymour.prototype = {
 		this._render();
 	},
 
+	/**
+	 * Clean up input event and render.
+	 * @private
+	 */
 	onInputEnd : function() {
-		this.inputIsDown = false;
+		this._inputIsDown = false;
 		this._render();
 		if ( this.doRequestRender ) {
 			this._requestRender();
 		}
 	},
 
+	//
 	// Touch events
-	onTouchStart : function(ev) {
+	//
+	/**
+	 * Call onInputStart
+	 * @private
+	 * @param {number} ev <a src="https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent">TouchEvent</a>
+	 */
+	onTouchStart : function( ev ) {
 		ev.preventDefault();
 		if ( ev.touches.length == 2 ) {
 			this.seymourInstance.interactionMode = INTERACTION_ENUM.translate;
@@ -307,20 +401,37 @@ Seymour.prototype = {
 		);
 	},
 
-	onTouchMove : function(ev) {
+	/**
+	 * Call onInputMove
+	 * @private
+	 * @param {number} ev <a src="https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent">TouchEvent</a>
+	 */
+	onTouchMove : function( ev ) {
 		ev.preventDefault();
 		this.seymourInstance.onInputMove(
 			ev.touches[0].clientX, 
 			ev.touches[0].clientY); 
 	},
 
-	onTouchEnd : function(ev) {
+	/**
+	 * Call onInputEnd
+	 * @private
+	 * @param {number} ev <a src="https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent">TouchEvent</a>
+	 */
+	onTouchEnd : function( ev ) {
 		ev.preventDefault();
 		this.seymourInstance.onInputEnd(); 
 	},
 
+	//
 	// Mouse events
-	onDocumentMouseWheel : function(ev) {
+	//
+	/**
+	 * Parse MouseEvent and call zoom.
+	 * @private
+	 * @param {number} ev <a src="https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent">MouseEvent</a>
+	 */
+	onDocumentMouseWheel : function( ev ) {
 		event.preventDefault();
 
 		if (event.hasOwnProperty("wheelDelta")) {
@@ -330,7 +441,12 @@ Seymour.prototype = {
 		}
 	},
 
-	onDocumentMouseDown : function(ev) {
+	/**
+	 * Set interactionMode and call onInputEnd.
+	 * @private
+	 * @param {number} ev <a src="https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent">MouseEvent</a>
+	 */
+	onDocumentMouseDown : function( ev ) {
 		if (event.ctrlKey) {
 			this.seymourInstance.interactionMode = INTERACTION_ENUM.light;
 		} else if (event.button == 2) { // right button
@@ -342,27 +458,43 @@ Seymour.prototype = {
 		this.seymourInstance.onInputStart(event.clientX, event.clientY); 
 	},
 
-	onDocumentMouseMove : function(ev) {
-		this.seymourInstance.onInputMove(event.clientX, event.clientY); 
+	/**
+	 * Call onInputMove
+	 * @private
+	 * @param {number} ev <a src="https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent">MouseEvent</a>
+	 */
+	onDocumentMouseMove : function( ev ) {
+		this.seymourInstance.onInputMove( event.clientX, event.clientY ); 
 	},
 
-	onDocumentMouseUp : function(ev) {
+	/**
+	 * Call onInputUp
+	 * @private
+	 * @param {number} ev <a src="https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent">MouseEvent</a>
+	 */
+	onDocumentMouseUp : function( ev ) {
 		this.seymourInstance.onInputEnd();
 	},
 
 	//----------------------------------------------------------------------------------------
 	// UTILS
 	//----------------------------------------------------------------------------------------
-	// Rolling ball rotation from The Rolling Ball (Hanson 1992) http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.69.2209&rep=rep1&type=pdf
-	_rollingBall : function(dx, dy) {
-		if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1) return this.m.identity();
+	/**
+	 * Rolling ball rotation from <a src="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.69.2209&rep=rep1&type=pdf">The Rolling Ball (Hanson 1992)</a>.
+	 * @private
+	 * @param {number} dx
+	 * @param {number} dy
+	 * @return {Object} <a src="https://threejs.org/docs/#api/en/math/Matrix4">THREE.Matrix4</a> rotation matrix
+	 */
+	_rollingBall : function( dx, dy ) {
+		if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1) return this._m.identity();
 
 		var dr = Math.sqrt(dx*dx + dy*dy)
 		var R = 100;
 		var cos = R/Math.sqrt(R*R + dr*dr)
 		var sin = dr/Math.sqrt(R*R + dr*dr)
 
-		this.m.set(
+		this._m.set(
 			cos + (dy/dr)*(dy/dr)*(1-cos),
 			-(dx/dr)*(dy/dr)*(1-cos),
 			(dx/dr)*sin,
@@ -384,20 +516,30 @@ Seymour.prototype = {
 			0
 		);
 
-		return this.m;
+		return this._m;
 	},
 
 	//----------------------------------------------------------------------------------------
 	// EXPOSED FUNCTIONS
 	//----------------------------------------------------------------------------------------
+	/**
+	 * Start sending rendering requests to the server for each frame.
+	 */
 	start : function() {
 		this.doRequestRender = true;
 	},
 
+	/**
+	 * Stop sending rendering requests to the server for each frame.
+	 */
 	pause : function() {
 		this.doRequestRender = false;
 	},
 
+	/**
+	 * Loads the model in the given file to the Seymour client scene.
+	 * @param {string} path path to file
+	 */
 	loadModel : function(path) {
 		// instantiate a loader
 		var seymourInstance = this;
@@ -449,14 +591,25 @@ Seymour.prototype = {
 		} );
 	},
 
+	/**
+	 * Get the URI for the current frame.
+	 * @returns {string} uri for current frame
+	 */
 	getCurrentFrameRequest : function() {
 		return this._renderString();
 	},
 
+	/**
+	 * Enable/disable default rolling ball interaction with models.
+	 * @param {boolean} flag update value
+	 */
 	enableModelInteraction : function(flag) {
-		this.objectInteraction = flag;
+		this._objectInteraction = flag;
 	},
 
+	/**
+	 * Hide the imgOverlay.
+	 */
 	hideOverlay : function() {
 		this.imgOverlay.style.visibility = "hidden";
 		this.imgOverlay.src = "";
@@ -464,41 +617,21 @@ Seymour.prototype = {
 		this.imgOverlay.style.height = "0pt";
 	},
 
+	/**
+	 * Show the imgOverlay.
+	 */
 	showOverlay : function() {
 		this.imgOverlay.style.visibility = "visible";
 		this.imgOverlay.style.width = "";
 		this.imgOverlay.style.height = "";
 	},
 
+	/**
+	 * Render a frame in the client canvas and, if doRequestRender is true, request a render from the server.
+	 */
 	render : function() {
 		this._render();
 		if (this.doRequestRender)
 			this._requestRender();
-	},
-
-	setRotationMatrix : function(matStr) {
-		var vals = matStr.split(',');
-		for (i=0; i<vals.length; i++) vals[i] = parseFloat(vals[i]);
-		this.rotationMatrix.elements = vals.slice();
-		this.models.setRotationFromMatrix(this.rotationMatrix);
-		// this.render();
-	},
-
-	setFov : function(fov) {
-		this.camera.fov = fov;
-		this.camera.updateProjectionMatrix();
-		// this.render();
-	},
-
-	setPosition : function(posStr) {
-		var pos = posStr.split(',');
-		this.models.position.x = parseFloat(pos[0]);
-		this.models.position.y = parseFloat(pos[1]);
-		// this.render();
 	}
 };
-
-function getPosition() {
-	var current = this.models;
-	return '"'+current.position.x+','+current.position.y+'"';
-}

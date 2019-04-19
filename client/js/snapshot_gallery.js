@@ -1,6 +1,7 @@
 var seymour;
 
 window.onload = function() {
+	// seymour setup
 	var myElement = document.getElementById( 'seymour-container' );
 	var options = {
 		width: 512, 
@@ -10,6 +11,7 @@ window.onload = function() {
 	seymour = new Seymour( myElement, options );
 	seymour.loadModel( './models/ply/queen/queen.ply' );
 
+	// snapshot gallery
 	document.getElementById( 'snapshot-xl' ).width = 512;
 	document.getElementById( 'snapshot-xl' ).height = 512;
 	document.getElementById( 'camera-btn' ).onclick = handleCameraBtn;
@@ -17,6 +19,7 @@ window.onload = function() {
 }
 
 function handleCameraBtn() {
+	// add a new snapshot
 	document.getElementById( 'gallery' ).innerHTML += 
 		`<div class="snapshot" style="background-image: url('`
 			+ document.getElementById("seymour-img-overlay").src +
@@ -31,6 +34,7 @@ function handleCameraBtn() {
 			<svg class="delete button" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M24 20.188l-8.315-8.209 8.2-8.282-3.697-3.697-8.212 8.318-8.31-8.203-3.666 3.666 8.321 8.24-8.206 8.313 3.666 3.666 8.237-8.318 8.285 8.203z"/></svg>
 		</div>`;
 
+	// make sure event listeners are attached to all the snapshot buttons
 	var snapshots = document.getElementsByClassName( 'snapshot' ) ;
 	for (var i=0; i<snapshots.length; i++) {
 		var snapshot = snapshots[i];
@@ -40,14 +44,25 @@ function handleCameraBtn() {
 }
 
 function handleSnapshot() {
-	seymour.setRotationMatrix( this.getAttribute( 'data-rot' ) );
-	seymour.setFov( this.getAttribute( 'data-fov' ) );
-	seymour.setPosition( this.getAttribute( 'data-pos' ) );
+	// set rotation matrix
+	var vals = this.getAttribute( 'data-rot' ).split(',');
+	for (i=0; i<vals.length; i++) vals[i] = parseFloat(vals[i]);
+	this.rotationMatrix.elements = vals.slice();
+	this.models.setRotationFromMatrix(this.rotationMatrix);
+
+	// set fov of camera
+	seymour.camera.fov = this.getAttribute( 'data-fov' );
+	seymour.camera.updateProjectionMatrix();
+
+	// set position of models
+	var pos = this.getAttribute( 'data-pos' ).split(',');
+	this.models.position.x = parseFloat(pos[0]);
+	this.models.position.y = parseFloat(pos[1]);
+
+	// set imgOverlay
 	var src = this.style.backgroundImage.slice(4, -1).replace(/"/g, "");
-	console.log(src)
 	document.getElementById( 'seymour-img-overlay' ).src = "";
 	document.getElementById( 'seymour-img-overlay' ).src = src;
-	console.log(document.getElementById( 'seymour-img-overlay' ).src)
 }
 
 function handleDeleteBtn() {
