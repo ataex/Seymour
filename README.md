@@ -41,7 +41,7 @@ Seymour is a client-server architecture and requires a properly configured Nginx
 1. Compile the Seymour server and start the FCGI process, [see server README](./server/README.md#backend---compilation-and-running).
 1. Visit your sample Seymour webpage at [http://localhost/simple-seymour.html](http://localhost/simple-seymour.html)!
 
-To cite:
+### To cite
 
         @phdthesis{christiansen2019modelusevh,
           title={Extending Model Use in Virtual Heritage: User-Centric Implementation of a Proctected Remote Rendering Visualization Tool},
