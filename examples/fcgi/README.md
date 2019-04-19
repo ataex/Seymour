@@ -15,9 +15,9 @@ sudo apt-get install libfcgi-dev spawn-fcgi curl nginx
 # run nginx using the provided configuration
 sudo nginx -c <path to nginx.conf>
 # compile fcgi_script
-g++ <path to fcgi program> -lfcgi++ -lfcgi -o fcgi_script
+g++ <path to fcgi program> -lfcgi++ -lfcgi -o fcgi_script.o
 # spawn the fcgi app on port 8000 with no fork
-spawn-fcgi -p 8000 -n fcgi_script
+spawn-fcgi -p 8000 -n fcgi_script.o
 ```
 To see the fcgi scripts in action, you may use curl:
 ```sh
