@@ -19,13 +19,12 @@ See the root README for step-by-step instructions.
 
 ### Backend - Compilation and Running
 ```sh
-# first cd into the Seymour_v2/seymour directory
+# first cd into the Seymour root directory
+cd ~/Seymour
 # compile seymour_backend 
-g++ -I ./classes -I ./external ./external/lodepng.cpp seymour.cpp -lGL -lGLEW -lglfw -lSOIL -lassimp -ljpeg -lfcgi++ -lfcgi -lssl -lcrypto -o seymour_backend.o
+g++ -I./classes -I./external ./external/lodepng.cpp seymour.cpp -lGL -lGLEW -lglfw -lSOIL -lassimp -ljpeg -lfcgi++ -lfcgi -lssl -lcrypto -o seymour_backend.o
 # run with spawn-fcgi
 spawn-fcgi -p 8000 -n ./seymour_backend.o
-
-g++ -I ./classes modeltobin.cpp -lGL -lGLEW -lglfw -lSOIL -lassimp modeltobin.o
 
 # to run headless first execute
 Xvfb :99 &
