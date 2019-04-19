@@ -5,8 +5,6 @@
 #include <jpeglib.h>
 #include "lodepng.h"
 
-#include "Timer.h"
-
 /* setup the buffer but we did that in the main function */
 void init_buffer(jpeg_compress_struct* cinfo) {}
  
@@ -40,8 +38,6 @@ public:
     void writeFrameToCout() {
         cerr << "here" << endl;
 
-        Timer::getInstance()->addTime("Start FramebufferReader");
-        // auto start = high_resolution_clock::now(); 
     	// Read the pixels from the frame buffer
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
@@ -51,13 +47,9 @@ public:
         	glReadPixels(0, 0, this->screen_width, this->screen_height, GL_RGB, GL_UNSIGNED_BYTE, this->pixels);
         }
 
-        Timer::getInstance()->addTime("Read pixels");
-
         // leifchri: is there not a faster way to do this? Why doesn't the frame buffer draw flipped?
         // flip the image along the x-axis
         flipImage(this->pixels, this->screen_width, this->screen_height, this->imageSizeInBytes);
-
-        Timer::getInstance()->addTime("Flip Pixels");
 
         std::time_t t = std::time(0); 
         std::stringstream ss;
@@ -70,8 +62,6 @@ public:
 	    	str = "./frames/frame" + ss.str() + ".jpeg";
 	        writeJpeg(this->pixels, this->screen_width, this->screen_height, str);
 		}
-
-        Timer::getInstance()->addTime("Image Write");
 
         // vars for file reading
         FILE * pFile;
@@ -102,7 +92,6 @@ public:
         fclose (pFile);
 
         free(buffer);
-        Timer::getInstance()->addTime("Write Image to COUT");
     }
 
     ~FramebufferReader() {
