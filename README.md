@@ -37,6 +37,7 @@ Seymour is a client-server architecture and requires a properly configured Nginx
     # copy all client code to the web root
     sudo cp -r client/* /var/www/html
     ```
+1. Configure the client for your host, [see the client README](./client/README.md).
 1. Compile the Seymour server and start the FCGI process, [see server README](./server/README.md#backend---compilation-and-running).
 1. Visit your sample Seymour webpage at [http://localhost/simple-seymour.html](http://localhost/simple-seymour.html)!
 
