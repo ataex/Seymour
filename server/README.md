@@ -57,3 +57,5 @@ For especially slow machines, uncomment the sleep_for function on the following 
 ## Customization
 
 Coming soon...
+
+<!-- change size of render window, load different models, change distortion settings-->
