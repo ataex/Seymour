@@ -13,7 +13,7 @@ window.onload = function main() {
 	var options = {
 		width: 512, 
 		height: 512, 
-		backend: '10.10.10.100'
+		backend: 'localhost'
 	};
 	seymour = new Seymour( myElement, options );
 	seymour.loadModel( './models/ply/saint-nicodeme-plumeliau/saint-nicodeme-plumeliau.ply' );

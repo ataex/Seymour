@@ -36,8 +36,6 @@ public:
     }
 
     void writeFrameToCout() {
-        cerr << "here" << endl;
-
     	// Read the pixels from the frame buffer
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
@@ -56,10 +54,10 @@ public:
         ss << t;
         string str;
     	if (this->extension.compare("png") == 0) {
-	    	str = "./frames/frame" + ss.str() + ".png";
+	    	str = "./frame.png";
     		writePng(this->pixels, this->screen_width, this->screen_height, str);
     	} else {
-	    	str = "./frames/frame" + ss.str() + ".jpeg";
+	    	str = "./frame.jpeg";
 	        writeJpeg(this->pixels, this->screen_width, this->screen_height, str);
 		}
 
@@ -71,7 +69,6 @@ public:
 
         pFile = fopen ( str.c_str() , "rb" );
         if (pFile==NULL) {fputs ("File error",stderr); exit (1);}
-        // std::cerr << "Open: " << fileno(pFile) << std::endl;
 
         // obtain file size:
         fseek (pFile , 0 , SEEK_END);
@@ -88,7 +85,6 @@ public:
 
         std::cout << std::string(buffer,lSize);
 
-        // std::cerr << "Close: " << fileno(pFile) << std::endl;
         fclose (pFile);
 
         free(buffer);
@@ -135,7 +131,6 @@ private:
 	        fprintf(stderr, "ERROR %i: Can't open %s\n", errno, filename.c_str());
 	        exit(1);
 	    }
-	    // std::cerr << "Open: " << fileno(outfile) << std::endl;
 
 	    jpeg_stdio_dest(&cinfo, outfile);
 	    /* Step 3: set parameters for compression */
@@ -157,7 +152,6 @@ private:
 	    /* Step 6: Finish compression */
 	    jpeg_finish_compress(&cinfo);
 	    /* After finish_compress, we can close the output file. */	    
-	    // std::cerr << "Close: " << fileno(outfile) << std::endl;
 	    fclose(outfile);
 	    /* Step 7: release JPEG compression object */
 	    jpeg_destroy_compress(&cinfo);

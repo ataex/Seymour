@@ -114,12 +114,6 @@ int main(int argc, char **argv) {
         cout.rdbuf(&cout_fcgi_streambuf);
         // cerr.rdbuf(&cerr_fcgi_streambuf);    
 
-        if (debugFlag) {
-            std::cerr << "Debug Mode" << std::endl;
-            std::cout << "Content-type: text/html\r\n\r\n";
-            std::cout << "<h1>Debug Content</h1><br>";
-        }
-
         char * uri = FCGX_GetParam("REQUEST_URI", request.envp);
         std::string uri_str(uri);
 
@@ -180,9 +174,7 @@ int main(int argc, char **argv) {
         string seedstr = to_string(renderer.lightPosition[0][0]) + "," + to_string(renderer.lightPosition[0][1]) + "," + to_string(renderer.lightPosition[0][2]);
         char cstr1[seedstr.size() + 1];
         strcpy(cstr1, seedstr.c_str());
-        cerr << cstr1 << endl;
         unsigned int seed = getUIntHash(cstr1);
-        cerr << seed << endl;
         srand(seed);
 
         // better way to deal with this? do we want to do model by model? or entire scene?
@@ -251,7 +243,6 @@ void split(const std::string& str, std::vector<std::string>& cont, char delim = 
 }
 
 unsigned int getUIntHash(const char* s) {
-    cerr << s << endl;
     unsigned char digest[MD5_DIGEST_LENGTH];
     MD5((unsigned char*)&s, strlen(s), (unsigned char*)&digest);    
     char mdString[33]; 
@@ -343,7 +334,6 @@ glm::mat4 makeRandomMat(unsigned int seed) {
                 maxVector.z *= rz;
                 break;
             case 3:
-                std::cerr << "Shear" << std::endl;
                 break;
             default:
                 break;

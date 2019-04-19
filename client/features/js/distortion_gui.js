@@ -5,7 +5,7 @@ window.onload = function () {
 	var options = {
 		width: 512, 
 		height: 512, 
-		backend: '10.10.10.100'
+		backend: 'localhost'
 	};
 
 	seymour = new Seymour(myElement, options);
