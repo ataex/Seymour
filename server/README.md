@@ -13,7 +13,9 @@ sudo apt-get install libglm-dev libglew-dev libglfw3-dev libsoil-dev libjpeg-dev
 
 ### Configure Nginx
 
-[nginx.conf](./nginx.conf) shows a sample configuration for an Nginx server. By default, the nginx.conf file is located at /etc/nginx/nginx.conf
+See the root README for step-by-step instructions.
+
+[nginx.conf](./nginx.conf) shows a sample configuration for an Nginx server. By default, the nginx.conf file is located at /etc/nginx/nginx.conf.
 
 ### Backend - Compilation and Running
 ```sh
