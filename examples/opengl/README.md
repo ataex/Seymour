@@ -8,11 +8,11 @@ Examples are adapted from [SonarSystems series of OpenGL tutorials](https://gith
 
 ## Running the examples (under Linux)
 ### Installing Dependencies
-```
+```sh
 sudo apt-get install libglm-dev libglew-dev libglfw3-dev libsoil-dev
 ```
 ### Compilation and Running
-```
+```sh
 # compile hello_triangle
 g++ hello_triangle.cpp -lGL -lglfw -lGLEW -o hello_triangle
 ./hello_triangle
