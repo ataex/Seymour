@@ -21,12 +21,13 @@ Seymour is a client-server architecture and requires a properly configured Nginx
     ```sh
     # cd to the root of Seymour directoy
     cd ~/Seymour
+    # make sure to stop nginx
+    sudo nginx -s stop
     # save the default nginx.conf file
     sudo mv /etc/nginx/nginx.conf /etc/nginx/nginx-default.conf
     # copy the sample nginx.conf
     sudo cp server/nginx.conf /etc/nginx/nginx.conf
     # restart nginx
-    sudo nginx -s stop
     sudo nginx
     ```
 1. Copy the Seymour client to the Nginx web root, by defualt /var/www/html.
