@@ -32,6 +32,7 @@ The Seymour server uses OpenGL and Fast-CGI to create a long-running, rendering 
     spawn-fcgi -p 8000 -n ./seymour_backend.o
 
     # to run headless
+    # note that this may be significantly slower as it may not make use of the GPU
     sudo apt-get install xvfb
     xvfb-run spawn-fcgi -p 8000 -n ./seymour_backend.o
     ```
