@@ -49,9 +49,6 @@ public:
         // flip the image along the x-axis
         flipImage(this->pixels, this->screen_width, this->screen_height, this->imageSizeInBytes);
 
-        std::time_t t = std::time(0); 
-        std::stringstream ss;
-        ss << t;
         string str;
     	if (this->extension.compare("png") == 0) {
 	    	str = "./frame.png";
@@ -60,6 +57,7 @@ public:
 	    	str = "./frame.jpeg";
 	        writeJpeg(this->pixels, this->screen_width, this->screen_height, str);
 		}
+
 
         // vars for file reading
         FILE * pFile;

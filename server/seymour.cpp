@@ -50,12 +50,14 @@ along with this program.  If not, see <https://creativecommons.org/licenses/by-n
 #include <stdlib.h>
 #include <vector>
 #include <random>
+#include <chrono>
+#include <thread>
 
 using namespace std;
 
 bool debugFlag = false;
-int screenWidth = 800;
-int screenHeight = 800;
+int screenWidth = 512;
+int screenHeight = 512;
 
 vector<int> randomOrder;
 float distortionMax = 0.01;
@@ -215,8 +217,12 @@ int main(int argc, char **argv) {
         //
         // Render and stream
         //
-        renderer.render( &scene, &camera, &renderMesh );
-
+        // glDraw* calls are asynchronous, 
+        // thus the renderer may not have finished before the framebufferReader calls glReadPixels
+        // for machines with slower graphics cards change the last argument to false 
+        renderer.render( &scene, &camera, &renderMesh, false );
+        // in a worst case, use the sleep_for to add extra sleep time
+        // std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
         cout << "Content-type: image/jpeg\r\n\r\n";
         framebufferReader.writeFrameToCout();

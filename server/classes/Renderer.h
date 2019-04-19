@@ -107,7 +107,7 @@ public:
         this->blendNoisePerc = 1.00;
     }
 
-    void render( Scene *scene, Camera *camera, Mesh *renderMesh = nullptr ) {
+    void render( Scene *scene, Camera *camera, Mesh *renderMesh = nullptr, bool doSwapBuffers = true ) {
         if (renderMesh == nullptr) {
             // Render to render buffer
             glBindFramebuffer(GL_FRAMEBUFFER, 0);            
@@ -249,7 +249,7 @@ public:
         }
 
         // Swap the buffers
-        glfwSwapBuffers( this->window );
+        if (doSwapBuffers) glfwSwapBuffers( this->window );
     }
 
     void close() {
