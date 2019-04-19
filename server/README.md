@@ -1,4 +1,4 @@
-# Seymour Server Module
+# Seymour Server
 
 ## About
 
