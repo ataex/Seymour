@@ -1,16 +1,19 @@
-/* comment from youtube video
- Watch out for:
- -use of a non-standard preprocessor directive (pragma once),
- -use of user-defined type (aistring) before including the library which defines it,
- -inconsistent naming of struct members (in Vertex your members start with caps, in Texture they don't),
- -heavy use of copy assignment instead of pointer types,
- -unnecessary use of a newline before an opening curly brace.﻿
- */
-// what is pragma once?
-// code adapted from https://www.youtube.com/watch?v=ZbnEMM7vwmU
+/*
+Seymour Server - seymour.cpp
 
-// Std. Includes
-#include <string>
+Copyright (c) 2019, Leif Christiansen
+All rights reserved.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the CC Attribution-NonCommercial-ShareAlike 4.0 License.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+CC Attribution-NonCommercial-ShareAlike 4.0 License for more details.
+You should have received a copy of the CC Attribution-NonCommercial-ShareAlike 4.0 License
+along with this program.  If not, see <https://creativecommons.org/licenses/by-nc-sa/4.0/>.
+*/
 
 // GLEW
 #define GLEW_STATIC
@@ -35,19 +38,18 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
 
-// Other Libs
+// External Libs
 #include "SOIL/SOIL.h"
 #include <jpeglib.h>
-
-#include <iostream>
-#include <stdlib.h>
 #include "fcgio.h"
-#include <algorithm>
-#include <iterator>
-#include <vector>
-#include <random>
 #include <openssl/md5.h>
 
+// Std. Includes
+#include <string>
+#include <iostream>
+#include <stdlib.h>
+#include <vector>
+#include <random>
 #include "Timer.h"
 
 using namespace std;
@@ -59,7 +61,6 @@ int screenHeight = 800;
 vector<int> randomOrder;
 float distortionMax = 0.01;
 
-// http://www.martinbroadhurst.com/how-to-split-a-string-in-c.html
 void split(const std::string& str, std::vector<std::string>& cont, char delim);
 void swap(int* arr, int i, int j);
 void shuffle(int* arr, int start, int end);
@@ -70,6 +71,9 @@ glm::mat4 makeRandomMat(unsigned int seed);
 Timer *Timer::instance = 0;
 
 int main(int argc, char **argv) {
+    //
+    // Setup FCGI
+    //
     // Backup the stdio streambufs
     streambuf * cin_streambuf  = cin.rdbuf();
     streambuf * cout_streambuf = cout.rdbuf();
@@ -80,29 +84,32 @@ int main(int argc, char **argv) {
     FCGX_Init();
     FCGX_InitRequest(&request, 0, 0);
     
+    //
+    // Setup scene
+    //
     Renderer renderer(screenWidth, screenHeight);
     renderer.clearColor = glm::vec4( 0.0, 0.0, 0.0, 1.0 );
 
     Scene scene;
     Camera camera(glm::vec3( 0.0f, 0.0f, 0.0f ), 45.0f);
-    // Model model0( "res/models/cube/cube.obj" );
-    Model model0( "res/models/antoninus_pious/VC_0001_Antoninus_Pious-7m.obj" );
+
+    Model model0( "res/models/queen/queen.obj" );
     // Model model0( "res/models/saint-nicodeme-plumeliau/saint-nicodeme-plumeliau.obj" );
-    std::cerr << "Model loaded" << std::endl;
-    // Model model0( "res/models/sphere/sphere.obj" );
-    // scene.add( &model1 );
     scene.add( &model0 );
 
     Mesh renderMesh = MeshFactory::quadMesh(1.0f, 4, 1.0f, 4);
 
-    float m[] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    float viewMat[] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    float projMat[] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    float modelMatrix[] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    float viewMatrix[] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    float projectionMatrix[] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
 
     FramebufferReader framebufferReader("jpeg", screenWidth, screenHeight);
 
     // Game loop
     while (FCGX_Accept_r(&request) == 0) {
+        //
+        // read FCGI parameters
+        //
         fcgi_streambuf cin_fcgi_streambuf(request.in);
         fcgi_streambuf cout_fcgi_streambuf(request.out);
         // fcgi_streambuf cerr_fcgi_streambuf(request.err);
@@ -122,6 +129,7 @@ int main(int argc, char **argv) {
 
         //
         // get route
+        //
         char *temp1;
         if (uri[0] == '/') {
             temp1 = &uri[1];
@@ -134,7 +142,6 @@ int main(int argc, char **argv) {
 
         std::vector<std::string> words;
         split(temp2.substr(i+1,temp2.length()), words, ',');
-        //
 
         cerr << route << endl;
         cerr << "--RENDER--" << endl;
@@ -148,13 +155,13 @@ int main(int argc, char **argv) {
             if (words.size() >= 48) {
                 unsigned int j=0;
                 for (; j<16; j++) {
-                    m[j] = std::stod(words[j]);
+                    modelMatrix[j] = std::stod(words[j]);
                 }
                 for (; j<32; j++) {
-                    viewMat[j-16] = std::stod(words[j]);
+                    viewMatrix[j-16] = std::stod(words[j]);
                 }
                 for (; j<48; j++) {
-                    projMat[j-32] = std::stod(words[j]);
+                    projectionMatrix[j-32] = std::stod(words[j]);
                 }
                 renderer.useTexture = std::stoi(words[j++]);
             } else {
@@ -191,8 +198,8 @@ int main(int argc, char **argv) {
             std::cout << "Content-type: text/html\r\n\r\n" << "ERROR: Invalid route: " << route << std::endl;
         }
 
-        camera.viewMat = glm::make_mat4(viewMat);
-        camera.projectionMat = glm::make_mat4(projMat);
+        camera.viewMat = glm::make_mat4(viewMatrix);
+        camera.projectionMat = glm::make_mat4(projectionMatrix);
 
         string seedstr = to_string(renderer.lightPosition[0][0]) + "," + to_string(renderer.lightPosition[0][1]) + "," + to_string(renderer.lightPosition[0][2]);
         char cstr1[seedstr.size() + 1];
@@ -203,7 +210,7 @@ int main(int argc, char **argv) {
         srand(seed);
 
         // better way to deal with this? do we want to do model by model? or entire scene?
-        model0.modelMatrix = glm::make_mat4(m);
+        model0.modelMatrix = glm::make_mat4(modelMatrix);
         // cerr << to_string(model0.modelMatrix).c_str() << endl;
         // string seedstr = to_string(model0.modelMatrix);
         // cerr << "Seedstr: " << seedstr << endl;
