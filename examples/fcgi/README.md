@@ -7,11 +7,11 @@ Examples are taken from http://chriswu.me/blog/writing-hello-world-in-fcgi-with-
 
 ## Running the examples (under Linux)
 ### Installing Dependencies
-```
+```sh
 sudo apt-get install libfcgi-dev spawn-fcgi curl nginx
 ```
 ### Compilation and Running
-```
+```sh
 # run nginx using the provided configuration
 sudo nginx -c <path to nginx.conf>
 # compile fcgi_script
@@ -20,7 +20,7 @@ g++ <path to fcgi program> -lfcgi++ -lfcgi -o fcgi_script
 spawn-fcgi -p 8000 -n fcgi_script
 ```
 To see the fcgi scripts in action, you may use curl:
-```
+```sh
 # curl request
 curl http://localhost
 # curl request with POST parameter
