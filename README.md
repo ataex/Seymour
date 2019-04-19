@@ -43,11 +43,9 @@ Seymour is a client-server architecture and requires a properly configured Nginx
 
 ### To cite
 
-    ```
     @phdthesis{christiansen2019modelusevh,
           title={Extending Model Use in Virtual Heritage: User-Centric Implementation of a Proctected Remote Rendering Visualization Tool},
           author={Christiansen, Leif},
           year={2019},
           school={Indiana University}
-        }
-    ```
+    }
