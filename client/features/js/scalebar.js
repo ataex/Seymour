@@ -18,7 +18,7 @@ window.onload = function main() {
 		backend: 'localhost'
 	};
 	seymour = new Seymour( myElement, options );
-	seymour.loadModel( './models/ply/queen/queen.ply' );
+	seymour.loadModel( '../models/ply/queen/queen.ply' );
 
 	// Switch to an orthographic camera
 	var camera = new THREE.OrthographicCamera( -2, 2, 2, -2, 1, 1000 );

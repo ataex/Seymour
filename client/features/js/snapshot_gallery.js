@@ -9,7 +9,7 @@ window.onload = function() {
 		backend: 'localhost'
 	};
 	seymour = new Seymour( myElement, options );
-	seymour.loadModel( './models/ply/queen/queen.ply' );
+	seymour.loadModel( '../models/ply/queen/queen.ply' );
 
 	// snapshot gallery
 	document.getElementById( 'snapshot-xl' ).width = 512;

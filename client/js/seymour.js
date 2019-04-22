@@ -1,5 +1,5 @@
 /*
-Seymour
+Seymour Client - seymour.sj
 
 Copyright (c) 2019, Leif Christiansen
 All rights reserved.
@@ -35,6 +35,7 @@ const INTERACTION_ENUM = Object.freeze({
 
 /**
  * An instance of the seymour client, adding the rendering canvas to the supplied html element.
+ * @property {boolean} host Base URL of Seymour server.
  * @property {boolean} isResizable If true, client canvas will resize with window.
  * @property {boolean} doRequestRender If true, requests will be sent for server renderings.
  * @property {Object} interactionMode Current mode as INTERACTION_ENUM.
@@ -75,8 +76,8 @@ Seymour.prototype = {
 		// set defaults
 		this._windowWidth = options.width;
 		this._windowHeight = options.height;
-		this._host = options.backend;
-		this.isResizable = options.resizable;
+		this.host = options.backend;
+		this.isResizable = options.resizable || false;
 		
 		this.doRequestRender = true;
 		this._objectInteraction = true;
@@ -219,8 +220,8 @@ Seymour.prototype = {
 	 */
 	_renderString : function( useDefault=false ) {
 		if (useDefault)
-			return 'http://'+this._host+'/renderer/render/1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,1,0,0,0,0,1,0,0,0,0,1,0,0,0,-5,1,2.4142135623730954,0,0,0,0,2.4142135623730954,0,0,0,0,-1.00010000500025,-1,0,0,-0.200010000500025,0,1';
-		return 'http://' + this._host + '/renderer/render/' + 
+			return 'http://'+this.host+'/renderer/render/1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,1,0,0,0,0,1,0,0,0,0,1,0,0,0,-5,1,2.4142135623730954,0,0,0,0,2.4142135623730954,0,0,0,0,-1.00010000500025,-1,0,0,-0.200010000500025,0,1';
+		return 'http://' + this.host + '/renderer/render/' + 
 			this.models.matrix.elements.toString() + ',' + 
 			this.camera.matrixWorldInverse.elements.toString() + ',' + 
 			this.camera.projectionMatrix.elements.toString() + ',' + 
@@ -234,13 +235,14 @@ Seymour.prototype = {
 	 */
 	_lightString : function() {
 		var pos = this.pointLight0.position;
-		var path = 'http://' + this._host + '/renderer/light/' + 
+		var path = 'http://' + this.host + '/renderer/light/' + 
 			(this.pointLight0.visible?1:0) + ',' 
 			+ pos.x + ',' + pos.y + ','+ pos.z;
 		path += ",";
 		var pos = this.pointLight1.position;
 		path += (this.pointLight1.visible?1:0) + ',' 
-		+ pos.x + ',' + pos.y + ','+ pos.z;
+		+ pos.x + ',' + pos.y + ','+ pos.z +
+		Date.now(); // add time to avoid browser caching image
 		return path;
 	},
 

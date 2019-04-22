@@ -56,11 +56,12 @@ along with this program.  If not, see <https://creativecommons.org/licenses/by-n
 using namespace std;
 
 bool debugFlag = false;
-int screenWidth = 512;
-int screenHeight = 512;
+int screenWidth = 800;
+int screenHeight = 800;
 
 vector<int> randomOrder;
 float distortionMax = 0.01;
+float lightMax = 0.5;
 
 void split(const string& str, vector<string>& cont, char delim);
 void swap(int* arr, int i, int j);
@@ -159,13 +160,20 @@ int main(int argc, char **argv) {
                 i+=3;
             }
         } else if ( route.compare("distortions") == 0 ) {
-            framebufferReader.jpegQuality = stoi(words[0]);
-            renderer.blendNoisePerc = stof(words[1]);
-            randomOrder.clear();
-            if (stoi(words[2]) == 1) randomOrder.push_back(0);
-            if (stoi(words[3]) == 1) randomOrder.push_back(1);
-            if (stoi(words[4]) == 1) randomOrder.push_back(2);
-            distortionMax = stof(words[5]);
+            if (words.size() >= 7) {
+                framebufferReader.jpegQuality = stoi(words[0]);
+                renderer.blendNoisePerc = stof(words[1]);
+                renderer.useLight[3] = stoi(words[2]);
+                lightMax = stof(words[3]);
+                randomOrder.clear();
+                // translate
+                if (stoi(words[4]) == 1) randomOrder.push_back(0);
+                // rotate
+                if (stoi(words[5]) == 1) randomOrder.push_back(1);
+                // scale
+                if (stoi(words[6]) == 1) randomOrder.push_back(2);
+                distortionMax = stof(words[7]);
+            }
         } else {
             cout << "Content-type: text/html\r\n\r\n" << "ERROR: Invalid route: " << route << endl;
         }
@@ -194,8 +202,7 @@ int main(int argc, char **argv) {
         renderer.noiseTextureId = TextureLoader::TextureFromFile( string("random" +to_string(r)+ ".jpg").c_str(), "res/noise" );
 
         // Random lights
-        float lightMax = 2.0;
-        float dist = lightMax * (2 * ( (float)rand() / (float)RAND_MAX ) - 1.0);
+        float dist = (2 * ( (float)rand() / (float)RAND_MAX ) - 1.0);
         float x = rand();
         float y = rand();
         float z = rand();
@@ -204,7 +211,10 @@ int main(int argc, char **argv) {
         renderer.lightPosition[3][1] = dist * y/norm;
         renderer.lightPosition[3][2] = dist * z/norm;
 
-        lightMax = 0.2;
+        float lightX, lightY, lightZ;
+        lightX = renderer.lightPosition[0][0];
+        lightY = renderer.lightPosition[0][1];
+        lightZ = renderer.lightPosition[0][2];
         dist = lightMax * (2 * ( (float)rand() / (float)RAND_MAX ) - 1.0);
         x = rand();
         y = rand();
@@ -224,6 +234,12 @@ int main(int argc, char **argv) {
         // in a worst case, use the sleep_for to add extra sleep time
         // std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
+        // reset light position
+        renderer.lightPosition[0][0] = lightX;
+        renderer.lightPosition[0][1] = lightY;
+        renderer.lightPosition[0][2] = lightZ;
+
+        // stream rendered image
         cout << "Content-type: image/jpeg\r\n\r\n";
         framebufferReader.writeFrameToCout();
         cout << endl;
@@ -304,6 +320,7 @@ glm::mat4 makeRandomMat(unsigned int seed) {
 
         glm::vec3 tempV;
         switch(mode) {
+            // translate
             case 0:
                 rx *= dist;
                 ry *= dist;
@@ -316,6 +333,7 @@ glm::mat4 makeRandomMat(unsigned int seed) {
                 maxVector.y += abs(ry);
                 maxVector.z += abs(rz);
                 break;
+            // rotate
             case 1:
                 // use law of cosines to get angle in radians
                 // point that will move most is the corner of the, now potentially warped, unit sphere
@@ -328,6 +346,7 @@ glm::mat4 makeRandomMat(unsigned int seed) {
                 tempV = glm::vec3(maxVector.x, maxVector.y, maxVector.z);
                 maxVector = tempMat * maxVector;
                 break;
+            // scale
             case 2:
                 rx = 1.0 + (rx * dist) / maxVector.x;
                 ry = 1.0 + (ry * dist) / maxVector.y;

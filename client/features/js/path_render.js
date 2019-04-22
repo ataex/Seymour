@@ -11,7 +11,7 @@ window.onload = function main() {
 		backend: 'localhost'
 	};
 	seymour = new Seymour( myElement, options );
-	seymour.loadModel( './models/ply/queen/queen.ply' );
+	seymour.loadModel( '../models/ply/queen/queen.ply' );
 
 	// Setup event handlers
 	document.getElementById( 'record-btn' ).onclick = handleRecordBtn;

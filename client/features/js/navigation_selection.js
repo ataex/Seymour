@@ -16,7 +16,7 @@ window.onload = function main() {
 		backend: 'localhost'
 	};
 	seymour = new Seymour( myElement, options );
-	seymour.loadModel( './models/ply/saint-nicodeme-plumeliau/saint-nicodeme-plumeliau.ply' );
+	seymour.loadModel( '../models/ply/saint-nicodeme-plumeliau/saint-nicodeme-plumeliau.ply' );
 
 	// seymour.models.scale.set(5,5,5);
 	// seymour.camera.position.z += 5;
